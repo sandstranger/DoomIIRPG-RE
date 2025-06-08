@@ -29,6 +29,9 @@
 #include "Utils.h"
 #include "TinyGL.h"
 #include "GLES.h"
+#ifdef ANDROID
+#include <algorithm>
+#endif
 
 MenuSystem::MenuSystem() {
 	std::memset(this, 0, sizeof(MenuSystem));
@@ -472,14 +475,14 @@ void MenuSystem::moveDir(int n) { // J2ME
 		int begY1 = 0;
 		int begY2 = 0;
 
-		for (int i = 0; i < numItems; i++) { // Ajusta la posición si es necesario
+		for (int i = 0; i < numItems; i++) { // Ajusta la posiciï¿½n si es necesario
 			if (!(this->items[i].flags & 0x8001)) {
 				endItem = i;
 			}
 		}
 
 		//printf("endItem %d\n", endItem);
-		for (int i = 0; i < numItems; i++) { // Ajusta la posición si es necesario
+		for (int i = 0; i < numItems; i++) { // Ajusta la posiciï¿½n si es necesario
 			if (!(this->items[i].flags & 0x8001)) {
 				begItem = i;
 				break;
@@ -510,7 +513,7 @@ void MenuSystem::moveDir(int n) { // J2ME
 			int y2 = 0;
 
 			if (this->selectedIndex == this->scrollIndex) {
-				for (int i = 0; i < this->selectedIndex; i++) { // Ajusta la posición si es necesario
+				for (int i = 0; i < this->selectedIndex; i++) { // Ajusta la posiciï¿½n si es necesario
 					if (!(this->items[i].flags & 0x8000)) {
 						y1 += this->getMenuItemHeight2(i);
 						y2 += iVar2;
@@ -527,7 +530,7 @@ void MenuSystem::moveDir(int n) { // J2ME
 				this->m_scrollBar->field_0x48_ = std::min(this->m_scrollBar->field_0x48_, maxScroll2);
 			}
 
-			if (this->selectedIndex == begItem) {  // Ajusta la posición si es necesario
+			if (this->selectedIndex == begItem) {  // Ajusta la posiciï¿½n si es necesario
 				this->scrollIndex = 0;
 				this->m_scrollBar->field_0x44_ -= begY1;
 				this->m_scrollBar->field_0x48_ -= begY2;
@@ -4838,7 +4841,7 @@ void MenuSystem::handleUserMoved(int x, int y) {
 			return;
 		}
 
-		// [GEC] Hasta que este fuera del limite del rectangulo, permitirá el desplasamiento de los items del menu
+		// [GEC] Hasta que este fuera del limite del rectangulo, permitirï¿½ el desplasamiento de los items del menu
 		const int begMouseX = (int)(gBegMouseX * Applet::IOS_WIDTH);
 		const int begMouseY = (int)(gBegMouseY * Applet::IOS_HEIGHT);
 		if (pointInRectangle(x, y, begMouseX - 3, begMouseY - 3, 6, 6)) {

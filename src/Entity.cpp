@@ -17,6 +17,10 @@
 #include "JavaStream.h"
 #include "Enums.h"
 #include "Sound.h"
+#ifdef ANDROID
+#include <algorithm>
+#include <cstdio>
+#endif
 
 Entity::Entity() {
     std::memset(this, 0, sizeof(Entity));

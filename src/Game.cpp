@@ -23,6 +23,11 @@
 #include "SDLGL.h"
 #include "Input.h"
 #include "GLES.h"
+#ifdef ANDROID
+#include <algorithm>
+#include <cstdio>
+#endif
+
 
 Game::Game() {
 	std::memset(this, 0, sizeof(Game));

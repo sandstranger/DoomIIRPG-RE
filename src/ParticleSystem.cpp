@@ -10,6 +10,10 @@
 #include "Entity.h"
 #include "EntityDef.h"
 #include "Enums.h"
+#ifdef ANDROID
+#include <algorithm>
+#include <cstdio>
+#endif
 
 // ----------------------
 // ParticleEmitter Class

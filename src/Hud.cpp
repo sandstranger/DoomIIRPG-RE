@@ -19,6 +19,10 @@
 #include "CombatEntity.h"
 #include "MenuSystem.h"
 #include "Enums.h"
+#ifdef ANDROID
+#include <algorithm>
+#include <cstdio>
+#endif
 
 Hud::Hud() {
 	std::memset(this, 0, sizeof(Hud));

@@ -26,6 +26,9 @@
 #include "JavaStream.h"
 #include "Image.h"
 #include "Graphics.h"
+#ifdef ANDROID
+#include <cstdio>
+#endif
 
 Applet::Applet() {
 	std::memset(this, 0, sizeof(Applet));

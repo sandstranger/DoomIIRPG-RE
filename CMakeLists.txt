@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.22)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
-
 project(DoomIIRPG)
+
+if (NOT ANDROID)
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
+else()
+	set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
+endif()
 
 if(MSVC)
 	add_definitions("/D_CRT_SECURE_NO_WARNINGS")
@@ -16,7 +20,7 @@ find_package(OpenAL REQUIRED)
 find_package(OpenGL REQUIRED)
 
 # Global identifiers for each project/target
-set(HASH_LIBRARY_TGT_NAME           Hash-Library)
+set(HASH_LIBRARY_TGT_NAME           doomrpg2-Hash-Library)
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/third_party_libs/hash-library")

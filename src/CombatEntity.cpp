@@ -12,7 +12,9 @@
 #include "Canvas.h"
 #include "Game.h"
 #include "Enums.h"
-
+#if ANDROID
+#include <algorithm>
+#endif
 
 CombatEntity::CombatEntity() {
     //printf("CombatEntity::init\n");

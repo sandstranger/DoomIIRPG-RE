@@ -13,6 +13,10 @@
 #include "TinyGL.h"
 #include "JavaStream.h"
 #include "Sound.h"
+#ifdef ANDROID
+#include <algorithm>
+#include <cstdio>
+#endif
 
 Player::Player() {
 	std::memset(this, 0, sizeof(Player));

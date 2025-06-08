@@ -15,6 +15,10 @@
 #include "Enums.h"
 #include "Utils.h"
 #include "Menus.h"
+#ifdef ANDROID
+#include <algorithm>
+#include <cstdio>
+#endif
 
 int HackingGame::touchedColumn = -1;
 

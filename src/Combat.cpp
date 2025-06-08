@@ -17,6 +17,9 @@
 #include "Enums.h"
 #include "ParticleSystem.h"
 #include "Sound.h"
+#ifdef ANDROID
+#include <algorithm>
+#endif
 
 Combat::Combat() {
 	std::memset(this, 0, sizeof(Combat));

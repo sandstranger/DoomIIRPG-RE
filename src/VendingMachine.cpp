@@ -15,6 +15,10 @@
 #include "Sound.h"
 #include "Enums.h"
 #include "Menus.h"
+#ifdef ANDROID
+#include <algorithm>
+#include <cstdio>
+#endif
 
 VendingMachine::VendingMachine() {
 	std::memset(this, 0, sizeof(VendingMachine));

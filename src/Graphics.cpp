@@ -8,6 +8,12 @@
 #include "Canvas.h"
 #include "Text.h"
 #include "SDLGL.h"
+#include <string>
+#include <iostream>
+#ifdef ANDROID
+#include <algorithm>
+#include <cstdio>
+#endif
 
 #define COLOR_BYTE_TO_FLOAT(x) (float)((float)(x) * (1.f / 256)) // (1.f / 256) -> 0.0039062f
 
@@ -576,7 +582,7 @@ void Graphics::drawString(Image* img, Text* text, int x, int y, int h, int flags
                 }
             }
         }
-        else if (char1 == ' ' || char1 == ' ') {
+        else if (char1 == ' ' || ((unsigned char)char1 == 0xC2)) {
             if (rotateMode == 3) {
                 y -= 9;
             }

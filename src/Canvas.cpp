@@ -28,6 +28,9 @@
 #include "Utils.h"
 #include "Menus.h"
 #include "Input.h"
+#ifdef ANDROID
+#include <algorithm>
+#endif
 
 Canvas::Canvas() {
 	std::memset(this, 0, sizeof(Canvas));

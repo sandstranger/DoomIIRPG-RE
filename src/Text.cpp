@@ -5,6 +5,10 @@
 #include "Text.h"
 #include "JavaStream.h"
 #include "Resource.h"
+#ifdef ANDROID
+#include <algorithm>
+#include <cstdio>
+#endif
 
 // --------------------
 // Localization Class

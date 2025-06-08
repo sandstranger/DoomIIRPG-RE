@@ -4,6 +4,10 @@
 #include "CAppContainer.h"
 #include "App.h"
 #include "ZipFile.h"
+#ifdef ANDROID
+#include <algorithm>
+#include <cstdio>
+#endif
 
 // ------------------
 // InputStream Class
