@@ -22,6 +22,7 @@ private:
 
 public:
 
+    static constexpr int SCRIPTS_THREADS_SIZE = 20;
     static constexpr int32_t dropDirs[] { 64, 0, 64, 64, 0, 64, -64, 64, -64, 0, -64, -64, 0, -64, 64, -64 };
     static constexpr int MAX_GRID_ENTITIES = 9;
     static constexpr int MAX_ENTITIES = 275;
@@ -106,7 +107,7 @@ public:
     Entity* watchLine;
     LerpSprite lerpSprites[16];
     int numLerpSprites;
-    ScriptThread scriptThreads[20];
+    ScriptThread scriptThreads[SCRIPTS_THREADS_SIZE];
     int numScriptThreads;
     bool pathVisitedl[64];
     short pathParents[64];

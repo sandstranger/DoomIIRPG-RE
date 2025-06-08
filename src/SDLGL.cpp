@@ -66,11 +66,33 @@ bool SDLGL::Initialize() {
 		//this->winVidWidth = 1440;
 		//this->winVidHeight = 900;
 
-		this->window = SDL_CreateWindow("Doom II RPG By [GEC] Version 0.1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, winVidWidth, winVidHeight, flags);
+#ifdef ANDROID
+        flags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_FULLSCREEN;
+
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_NO_ERROR, 1);
+
+        SDL_DisplayMode displayMode;
+        SDL_GetDesktopDisplayMode(0, &displayMode);
+
+        this->window = SDL_CreateWindow("Doom II RPG By [GEC] Version 0.1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, displayMode.w, displayMode.h, flags);
 		if (!this->window) {
 			printf("Could not set %dx%d video mode: %s", winVidWidth, winVidHeight, SDL_GetError());
 		}
-
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+        SDL_SetWindowPosition(this->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+        SDL_SetWindowBordered(this->window, SDL_FALSE);
+        int winVidWidth, winVidHeight;
+        SDL_GetWindowSize(this->window, &winVidWidth, &winVidHeight);
+        this->updateWinVid(winVidWidth, winVidHeight);
+#else
+        this->window = SDL_CreateWindow("Doom II RPG By [GEC] Version 0.1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, winVidWidth, winVidHeight, flags);
+		if (!this->window) {
+			printf("Could not set %dx%d video mode: %s", winVidWidth, winVidHeight, SDL_GetError());
+		}
+#endif
 		this->vidWidth = Applet::IOS_WIDTH;
 		this->vidHeight = Applet::IOS_HEIGHT;
 		this->oldWindowMode = -1;
@@ -177,7 +199,7 @@ void SDLGL::updateVideo() {
 		SDL_GL_SetSwapInterval(this->vSync ? SDL_TRUE : SDL_FALSE);
 		this->oldVSync = this->vSync;
 	}
-
+#if !ANDROID
 	if (this->windowMode != this->oldWindowMode) {
 		SDL_SetWindowFullscreen(this->window, 0);
 		SDL_SetWindowBordered(this->window, SDL_TRUE);
@@ -201,6 +223,7 @@ void SDLGL::updateVideo() {
 	int winVidWidth, winVidHeight;
 	SDL_GetWindowSize(this->window, &winVidWidth, &winVidHeight);
 	this->updateWinVid(winVidWidth, winVidHeight);
+#endif
 }
 
 void SDLGL::restore() {

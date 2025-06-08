@@ -21,15 +21,31 @@
 #include "Utils.h"
 #include "TinyGL.h"
 #include "Input.h"
+#ifdef ANDROID
+#include <SDL_main.h>
+#include <jni.h>
+#endif
 
 void drawView(SDLGL* sdlGL);
 
+#ifdef ANDROID
+int SDL_main(int argc, char **argv) {
+#else
 int main(int argc, char* args[]) {
+#endif
+
+#ifdef ANDROID
+    chdir(getenv("ANDROID_GAME_PATH"));
+#endif
 
     int		UpTime = 0;
     
     ZipFile zipFile;
+#ifdef ANDROID
+    zipFile.openZipFile(getenv("RESOURCE_FILE_NAME"));
+#else
     zipFile.openZipFile("Doom 2 RPG.ipa");
+#endif
 
 	SDLGL sdlGL;
 	sdlGL.Initialize();
@@ -129,3 +145,26 @@ void drawView(SDLGL *sdlGL) {
     SDL_GL_SwapWindow(sdlGL->window);  // Swap the window/pBmp to display the result.
     
 }
+
+#ifdef ANDROID
+extern "C" {
+JNIEXPORT void JNICALL Java_com_mobilerpgpack_phone_engine_activity_EngineActivity_resumeSound(JNIEnv *env, jobject thisObject) {
+    CAppContainer::getInstance()->resumeOpenAL();
+}
+
+JNIEXPORT void JNICALL Java_com_mobilerpgpack_phone_engine_activity_EngineActivity_pauseSound(JNIEnv *env, jobject thisObject) {
+    CAppContainer::getInstance()->suspendOpenAL();
+}
+}
+
+extern "C" {
+JNIEXPORT jboolean JNICALL Java_com_mobilerpgpack_phone_engine_activity_EngineActivity_needToShowScreenControls(JNIEnv *env, jobject thisObject) {
+    CAppContainer *appContainer = CAppContainer::getInstance();
+    if (appContainer == nullptr || appContainer->app == nullptr || appContainer->app->canvas == nullptr){
+        return true;
+    }
+    int currentCanvasState = appContainer->app->canvas->state;
+    return currentCanvasState ==Canvas::ST_PLAYING || currentCanvasState ==Canvas::ST_COMBAT;
+}
+}
+#endif

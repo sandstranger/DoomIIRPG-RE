@@ -61,11 +61,15 @@ void CAppContainer::DoLoop(int time) {
 }
 
 void CAppContainer::suspendOpenAL() {
-
+    if (this && this->app){
+        this->app->sound->openAL_SetSystemVolume(0);
+    }
 }
 
 void CAppContainer::resumeOpenAL() {
-
+    if (this && this->app){
+        this->app->sound->openAL_SetSystemVolume(100);
+    }
 }
 
 void CAppContainer::userPressed(float pressX, float pressY) {

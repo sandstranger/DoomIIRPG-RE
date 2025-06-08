@@ -4979,7 +4979,7 @@ void Canvas::dequeueHelpDialog(bool b) {
 	this->helpMessageObjs[15] = object;
 	this->numHelpMessages--;
 	if (app->player->enableHelp) {
-		if (n3 == -1) {
+        if (n3<0 || n3>=Game::SCRIPTS_THREADS_SIZE) {
 			this->startDialog(nullptr, largeBuffer, n, n2, false);
 		}
 		else {
