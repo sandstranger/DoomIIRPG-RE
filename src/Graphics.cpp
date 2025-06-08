@@ -556,6 +556,7 @@ void Graphics::drawString(Image* img, Text* text, int x, int y, int h, int flags
     int n7 = strBeg + std::min(strEnd, text->length() - strBeg);
     for (int i = strBeg; i < n7; ++i) {
         char char1 = text->charAt(i);
+        std::wstring char1String (sizeof (char1), char1);
         if (char1 == '\n' || char1 == '|') {
 
             if (rotateMode == 3) {
@@ -582,7 +583,7 @@ void Graphics::drawString(Image* img, Text* text, int x, int y, int h, int flags
                 }
             }
         }
-        else if (char1 == ' ' || ((unsigned char)char1 == 0xC2)) {
+        else if (char1 == ' ' || char1String == L"\u00A0") {
             if (rotateMode == 3) {
                 y -= 9;
             }
