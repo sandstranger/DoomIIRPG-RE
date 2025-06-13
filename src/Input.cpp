@@ -423,10 +423,21 @@ static void rescanGameControllers() noexcept {
     // Note: a return of < 0 means an error, which we will ignore:
     const int numJoysticks = SDL_NumJoysticks();
 
-    for (int joyIdx = 0; joyIdx < numJoysticks; ++joyIdx) {
+    for (int joyIdx = numJoysticks -1 ; joyIdx >=0; joyIdx--) {
         // If we find a valid game controller or generic joystick then try to open it.
         // If we succeed then our work is done!
         if (SDL_IsGameController(joyIdx)) {
+
+            const char* name = SDL_GameControllerNameForIndex(joyIdx);
+            if (name && (
+                    strstr(name, "remote") ||
+                    strstr(name, "AOSP") ||
+                    strstr(name, "TV") ||
+                    strstr(name, "input"))
+                    ) {
+                continue; // Пропускаем пульт
+            }
+
             rescanGameControllers(joyIdx);
 
             if (gpJoystick){
@@ -435,7 +446,16 @@ static void rescanGameControllers() noexcept {
         }
     }
 
-    for (int joyIdx = 0; joyIdx < numJoysticks; ++joyIdx) {
+    for (int joyIdx = numJoysticks -1 ; joyIdx >=0; joyIdx--) {
+        const char* name = SDL_JoystickNameForIndex(joyIdx);
+        if (name && (
+                strstr(name, "remote") ||
+                strstr(name, "AOSP") ||
+                strstr(name, "TV") ||
+                strstr(name, "input"))
+                ) {
+            continue; // Пропускаем пульт
+        }
         // If we find a valid game controller or generic joystick then try to open it.
         // If we succeed then our work is done!
         rescanGameControllers(joyIdx);
@@ -1008,7 +1028,7 @@ void Input::handleEvents() noexcept {
             case SDL_JOYDEVICEREMOVED:
             case SDL_CONTROLLERDEVICEADDED:
             case SDL_CONTROLLERDEVICEREMOVED:
-            case SDL_CONTROLLERDEVICEREMAPPED:
+//            case SDL_CONTROLLERDEVICEREMAPPED:
                 rescanGameControllers();
                 break;
             
