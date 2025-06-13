@@ -39,6 +39,16 @@ enum class GamepadInput : uint8_t {
 	INVALID
 };
 
+typedef enum GameControllerAxis
+{
+    SDL_CONTROLLER_AXIS_LEFT_DOWN,
+    SDL_CONTROLLER_AXIS_LEFT_UP,
+    SDL_CONTROLLER_AXIS_LEFT_LEFT,
+    SDL_CONTROLLER_AXIS_LEFT_RIGHT,
+    SDL_CONTROLLER_AXIS_TRIGGER_LEFT,
+    SDL_CONTROLLER_AXIS_TRIGGER_RIGHT
+} GameControllerAxis;
+
 static constexpr uint8_t NUM_GAMEPAD_INPUTS = (uint32_t)GamepadInput::INVALID;
 
 // Direction for a joystick hat (d-pad)
@@ -83,10 +93,10 @@ struct JoystickAxis {
 
 extern char buttonNames[][NUM_GAMEPAD_INPUTS];
 
-#define KEYBINDS_MAX 11
+#define KEYBINDS_MAX 12
 #define IS_MOUSE_BUTTON			0x100000
 #define IS_CONTROLLER_BUTTON	0x200000
-#define IS_CONTROLLER_TRIGGER	0x400000
+#define IS_CONTROLLER_AXIS	0x400000
 typedef struct keyMapping_s {
 	int avk_action;
 	int keyBinds[KEYBINDS_MAX];
