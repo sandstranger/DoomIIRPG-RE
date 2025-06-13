@@ -77,22 +77,22 @@ float   gCurMouseY;
 keyMapping_t keyMapping[KEY_MAPPIN_MAX];
 keyMapping_t keyMappingTemp[KEY_MAPPIN_MAX];
 keyMapping_t keyMappingDefault[KEY_MAPPIN_MAX] = {
-    {AVK_UP | AVK_MENU_UP,				{SDL_SCANCODE_UP,SDL_SCANCODE_W,-1,-1,-1,-1,-1,-1,-1,-1}},	// Move forward
-    {AVK_DOWN | AVK_MENU_DOWN,			{SDL_SCANCODE_DOWN,SDL_SCANCODE_S,-1,-1,-1,-1,-1,-1,-1,-1}},	// Move backward
-    {AVK_LEFT | AVK_MENU_PAGE_UP,		{SDL_SCANCODE_LEFT,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	// Turn left/page up
-    {AVK_RIGHT | AVK_MENU_PAGE_DOWN,	{SDL_SCANCODE_RIGHT,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	// Turn right/page down
-    {AVK_MOVELEFT,						{SDL_SCANCODE_A,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Move left
-    {AVK_MOVERIGHT,						{SDL_SCANCODE_D,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Move right
-    {AVK_NEXTWEAPON,					{SDL_SCANCODE_Z,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Next weapon
-    {AVK_PREVWEAPON,					{SDL_SCANCODE_X,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Prev weapon
-    {AVK_SELECT | AVK_MENU_SELECT,		{SDL_SCANCODE_RETURN,-1,-1,-1,-1,-1,-1,-1,-1,-1}},  // Attack/Talk/Use
-    {AVK_PASSTURN,						{SDL_SCANCODE_C,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Pass Turn
-    {AVK_AUTOMAP,						{SDL_SCANCODE_TAB,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Automap
-    {AVK_MENUOPEN | AVK_MENU_OPEN,		{SDL_SCANCODE_ESCAPE,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	// Open menu/back
-    {AVK_ITEMS_INFO,                    {SDL_SCANCODE_I,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu items and info
-    {AVK_DRINKS,		                {SDL_SCANCODE_O,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu Dirnks
-    {AVK_PDA,		                    {SDL_SCANCODE_P,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu PDA
-    {AVK_BOTDISCARD,		            {SDL_SCANCODE_B,-1,-1,-1,-1,-1,-1,-1,-1,-1}}	    // Bot discart
+        {AVK_UP | AVK_MENU_UP,				{SDL_SCANCODE_UP,SDL_SCANCODE_W,SDL_CONTROLLER_BUTTON_DPAD_UP | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},	// Move forward
+        {AVK_DOWN | AVK_MENU_DOWN,			{SDL_SCANCODE_DOWN,SDL_SCANCODE_S,SDL_CONTROLLER_BUTTON_DPAD_DOWN | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1}},	// Move backward
+        {AVK_LEFT | AVK_MENU_PAGE_UP,		{SDL_SCANCODE_LEFT,SDL_CONTROLLER_BUTTON_DPAD_LEFT | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	// Turn left/page up
+        {AVK_RIGHT | AVK_MENU_PAGE_DOWN,	{SDL_SCANCODE_RIGHT,SDL_CONTROLLER_BUTTON_DPAD_RIGHT | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	// Turn right/page down
+        {AVK_MOVELEFT,						{SDL_SCANCODE_A,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Move left
+        {AVK_MOVERIGHT,						{SDL_SCANCODE_D,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Move right
+        {AVK_NEXTWEAPON,					{SDL_SCANCODE_Z,SDL_CONTROLLER_BUTTON_Y | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Next weapon
+        {AVK_PREVWEAPON,					{SDL_SCANCODE_X,SDL_CONTROLLER_BUTTON_B | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Prev weapon
+        {AVK_SELECT | AVK_MENU_SELECT,		{SDL_SCANCODE_RETURN,SDL_CONTROLLER_BUTTON_A | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1,-1}},  // Attack/Talk/Use
+        {AVK_PASSTURN,						{SDL_SCANCODE_C,SDL_CONTROLLER_BUTTON_X | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1,-1}},		// Pass Turn
+        {AVK_AUTOMAP,						{SDL_SCANCODE_TAB,SDL_CONTROLLER_BUTTON_BACK | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Automap
+        {AVK_MENUOPEN | AVK_MENU_OPEN,		{SDL_SCANCODE_ESCAPE,SDL_CONTROLLER_BUTTON_START | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	// Open menu/back
+        {AVK_ITEMS_INFO,                    {SDL_SCANCODE_I,SDL_CONTROLLER_BUTTON_LEFTSHOULDER | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu items and info
+        {AVK_DRINKS,		                {SDL_SCANCODE_O,SDL_CONTROLLER_BUTTON_RIGHTSHOULDER | IS_CONTROLLER_BUTTON,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu Dirnks
+        {AVK_PDA,		                    {SDL_SCANCODE_P,SDL_CONTROLLER_AXIS_TRIGGERLEFT | IS_CONTROLLER_TRIGGER,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	    // Menu PDA
+        {AVK_BOTDISCARD,		            {SDL_SCANCODE_B,SDL_CONTROLLER_AXIS_TRIGGERRIGHT | IS_CONTROLLER_TRIGGER,-1,-1,-1,-1,-1,-1,-1,-1,-1}}	    // Bot discart
 };
 
 //--------------------
@@ -238,11 +238,11 @@ GamepadInput sdlJoyAxisToInput(const uint8_t axis, const float value) noexcept {
         float xVal = value;
         // Below of dead zone
         if (xVal < -0) {
-            return (numAxes <= 2) ? GamepadInput::BTN_DPAD_LEFT : GamepadInput::BTN_LAXIS_LEFT;
+            return GamepadInput::BTN_DPAD_LEFT;
         }
         // Above of dead zone
         else if (xVal > 0) {
-            return (numAxes <= 2) ? GamepadInput::BTN_DPAD_RIGHT : GamepadInput::BTN_LAXIS_RIGHT;
+            return GamepadInput::BTN_DPAD_RIGHT;
         }
     }
     case 1: {
@@ -250,11 +250,11 @@ GamepadInput sdlJoyAxisToInput(const uint8_t axis, const float value) noexcept {
         float yVal = value;
         // Below of dead zone
         if (yVal < -0) {
-            return (numAxes <= 2) ? GamepadInput::BTN_DPAD_UP : GamepadInput::BTN_LAXIS_UP;
+            return GamepadInput::BTN_DPAD_UP;
         }
         // Above of dead zone
         else if (yVal > 0) {
-            return (numAxes <= 2) ? GamepadInput::BTN_DPAD_DOWN : GamepadInput::BTN_LAXIS_DOWN;
+            return GamepadInput::BTN_DPAD_DOWN;
         }
     }
     case 3: {
@@ -357,6 +357,54 @@ static void closeCurrentGameController() noexcept {
     gJoystickId = {};
 }
 
+static void rescanGameControllers(int joyIdx) noexcept {
+
+    gpGameController = SDL_GameControllerOpen(joyIdx);
+
+    if (gpGameController) {
+        gpJoystick = SDL_GameControllerGetJoystick(gpGameController);
+        gJoystickId = SDL_JoystickInstanceID(gpJoystick);
+
+#ifdef _WIN32
+        // Check if joystick supports Rumble
+                if (!SDL_GameControllerHasRumble(gpGameController)) {
+                    printf("Warning: Game controller does not have rumble! SDL Error: %s\n", SDL_GetError());
+                }
+#endif
+        return;
+    }
+
+
+    // If we already have a gamepad or generic joystick then just re-check that it is still connected.
+    // Note that we can check if a gamepad is connected by checking if the associated joystick is connected.
+    // Fallback to opening the controller as a generic joystick if it's not supported through the game controller interface
+    gpJoystick = SDL_JoystickOpen(joyIdx);
+
+    if (gpJoystick) {
+        gJoystickId = SDL_JoystickInstanceID(gpJoystick);
+
+        // Check if joystick supports haptic
+        if (!SDL_JoystickIsHaptic(gpJoystick)) {
+            printf("Warning: Controller does not support haptics! SDL Error: %s\n", SDL_GetError());
+        }
+        else
+        {
+            // Get joystick haptic device
+            gJoyHaptic = SDL_HapticOpenFromJoystick(gpJoystick);
+            if (gJoyHaptic == NULL) {
+                printf("Warning: Unable to get joystick haptics! SDL Error: %s\n", SDL_GetError());
+            }
+            else
+            {
+                // Initialize rumble
+                if (SDL_HapticRumbleInit(gJoyHaptic) < 0) {
+                    printf("Warning: Unable to initialize haptic rumble! SDL Error: %s\n", SDL_GetError());
+                }
+            }
+        }
+    }
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 // Rescans for SDL game controllers and generic joysticks to use: just uses the first available controller or joystick.
 // This may choose wrong in a multi-gamepad/joystick situation but the user can always disconnect one to clarify which one is wanted.
@@ -379,48 +427,21 @@ static void rescanGameControllers() noexcept {
         // If we find a valid game controller or generic joystick then try to open it.
         // If we succeed then our work is done!
         if (SDL_IsGameController(joyIdx)) {
-            printf("IsGameController\n");
-            // This is a game controller - try opening that way
-            gpGameController = SDL_GameControllerOpen(joyIdx);
+            rescanGameControllers(joyIdx);
 
-            if (gpGameController) {
-                gpJoystick = SDL_GameControllerGetJoystick(gpGameController);
-                gJoystickId = SDL_JoystickInstanceID(gpJoystick);
-
-                // Check if joystick supports Rumble
-                if (!SDL_GameControllerHasRumble(gpGameController)) {
-                    printf("Warning: Game controller does not have rumble! SDL Error: %s\n", SDL_GetError());
-                }
-                break;
+            if (gpJoystick){
+                return;
             }
         }
+    }
 
-        // Fallback to opening the controller as a generic joystick if it's not supported through the game controller interface
-        gpJoystick = SDL_JoystickOpen(joyIdx);
+    for (int joyIdx = 0; joyIdx < numJoysticks; ++joyIdx) {
+        // If we find a valid game controller or generic joystick then try to open it.
+        // If we succeed then our work is done!
+        rescanGameControllers(joyIdx);
 
-        if (gpJoystick) {
-            gJoystickId = SDL_JoystickInstanceID(gpJoystick);
-
-            // Check if joystick supports haptic
-            if (!SDL_JoystickIsHaptic(gpJoystick)) {
-                printf("Warning: Controller does not support haptics! SDL Error: %s\n", SDL_GetError());
-            }
-            else
-            {
-                // Get joystick haptic device
-                gJoyHaptic = SDL_HapticOpenFromJoystick(gpJoystick);
-                if (gJoyHaptic == NULL) {
-                    printf("Warning: Unable to get joystick haptics! SDL Error: %s\n", SDL_GetError());
-                }
-                else
-                {
-                    // Initialize rumble
-                    if (SDL_HapticRumbleInit(gJoyHaptic) < 0) {
-                        printf("Warning: Unable to initialize haptic rumble! SDL Error: %s\n", SDL_GetError());
-                    }
-                }
-            }
-            break;
+        if (gpJoystick){
+            return;
         }
     }
 }
@@ -632,6 +653,16 @@ Input::~Input() {
 
 // Port: set default Binds
 void Input::init() {
+#ifdef ANDROID
+    char *pathToSdl2ControllerDb = getenv("PATH_TO_SDL2_CONTROLLER_DB");
+
+    if (SDL_GameControllerAddMappingsFromFile(pathToSdl2ControllerDb) < 0) {
+        SDL_Log("Couldn't load mappings: %s\n", SDL_GetError());
+    } else{
+        SDL_Log("Custom controller db was loaded from: %s", pathToSdl2ControllerDb);
+    }
+#endif
+
     std::memcpy(keyMapping, keyMappingDefault, sizeof(keyMapping));
     std::memcpy(keyMappingTemp, keyMappingDefault, sizeof(keyMapping));
 
@@ -683,7 +714,7 @@ void Input::unBind(int* keyBinds, int index)
 void Input::setBind(int* keyBinds, int keycode) {
     int i;
 
-    // Examina si existe anteriormente, si es así, se desvinculará de la lista
+    // Examina si existe anteriormente, si es asï¿½, se desvincularï¿½ de la lista
     // Examines whether it exists previously, if so, it will be unbind from the list
     for (i = 0; i < KEYBINDS_MAX; i++) {
         if (keyBinds[i] == keycode) {
@@ -989,8 +1020,16 @@ void Input::handleEvents() noexcept {
         for (i = 0; i < 2; ++i) {
             for (j = 0; j < KEYBINDS_MAX; j++) {
                 // Controller
-                if ((keyMapping[i].keyBinds[j] & IS_CONTROLLER_BUTTON)) {
-                    const GamepadInput input = (GamepadInput)(keyMapping[i].keyBinds[j] & ~(IS_CONTROLLER_BUTTON | IS_MOUSE_BUTTON));
+                if ((keyMapping[i].keyBinds[j] & (IS_CONTROLLER_BUTTON | IS_CONTROLLER_TRIGGER)) != 0) {
+                    GamepadInput input;
+                    if (keyMapping[i].keyBinds[j] & IS_CONTROLLER_TRIGGER){
+                        int raw = keyMapping[i].keyBinds[j] & ~(IS_CONTROLLER_TRIGGER);
+                        auto axis =static_cast<SDL_GameControllerAxis>(raw);
+                        input = sdlAxisToInput(axis);
+                    } else{
+                        input = (GamepadInput)(keyMapping[i].keyBinds[j] & ~(IS_CONTROLLER_BUTTON | IS_MOUSE_BUTTON));
+                    }
+
                     // Joystick
                     if (isJoystickButtonJustReleased((uint32_t)input)) {
                         removeValueFromVector((uint32_t)input, gJoystickButtonsJustReleased);
@@ -1055,8 +1094,16 @@ void Input::handleEvents() noexcept {
         for (i = 0; i < (sizeof(keyMapping) / sizeof(keyMapping_t)); ++i) {
             for (j = 0; j < KEYBINDS_MAX; j++) {
                 // Controller
-                if ((keyMapping[i].keyBinds[j] & IS_CONTROLLER_BUTTON)) {
-                    const GamepadInput input = (GamepadInput)(keyMapping[i].keyBinds[j] & ~(IS_CONTROLLER_BUTTON | IS_MOUSE_BUTTON));
+                if ((keyMapping[i].keyBinds[j] & (IS_CONTROLLER_BUTTON | IS_CONTROLLER_TRIGGER)) != 0) {
+                    GamepadInput input;
+                    if (keyMapping[i].keyBinds[j] & IS_CONTROLLER_TRIGGER){
+                        int raw = keyMapping[i].keyBinds[j] & ~(IS_CONTROLLER_TRIGGER);
+                        auto axis =static_cast<SDL_GameControllerAxis>(raw);
+                        input = sdlAxisToInput(axis);
+                    } else{
+                        input = (GamepadInput)(keyMapping[i].keyBinds[j] & ~(IS_CONTROLLER_BUTTON | IS_MOUSE_BUTTON));
+                    }
+
                     // Joystick
                     if (isJoystickButtonPressed((uint32_t)input)) {
                         removeValueFromVector((uint32_t)input, gJoystickButtonsPressed);
