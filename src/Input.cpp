@@ -696,7 +696,6 @@ void Input::init() {
         SDL_Log("Custom controller db was loaded from: %s", pathToSdl2ControllerDb);
     }
 #endif
-    SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
     std::memcpy(keyMapping, keyMappingDefault, sizeof(keyMapping));
     std::memcpy(keyMappingTemp, keyMappingDefault, sizeof(keyMapping));
