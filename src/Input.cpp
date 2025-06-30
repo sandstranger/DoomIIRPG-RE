@@ -83,16 +83,16 @@ keyMapping_t keyMappingDefault[KEY_MAPPIN_MAX] = {
         {AVK_RIGHT | AVK_MENU_PAGE_DOWN,	{SDL_SCANCODE_RIGHT,SDL_CONTROLLER_BUTTON_DPAD_RIGHT | IS_CONTROLLER_BUTTON,SDL_CONTROLLER_AXIS_LEFT_RIGHT | IS_CONTROLLER_AXIS,-1,-1,-1,-1,-1,-1,-1,-1,-1}},	// Turn right/page down
         {AVK_MOVELEFT,						{SDL_SCANCODE_A,-1,                                                       -1, -1, -1, -1, -1, -1, -1, -1}},		// Move left
         {AVK_MOVERIGHT,						{SDL_SCANCODE_D,-1,                                                      -1, -1, -1, -1, -1, -1, -1, -1}},		// Move right
-        {AVK_NEXTWEAPON,					{SDL_SCANCODE_Z,SDL_CONTROLLER_BUTTON_Y | IS_CONTROLLER_BUTTON,             -1, -1, -1, -1, -1, -1, -1, -1, -1}},		// Next weapon
-        {AVK_PREVWEAPON,					{SDL_SCANCODE_X,SDL_CONTROLLER_BUTTON_B | IS_CONTROLLER_BUTTON,             -1, -1, -1, -1, -1, -1, -1, -1, -1}},		// Prev weapon
+        {AVK_NEXTWEAPON,					{SDL_SCANCODE_Z,SDL_CONTROLLER_AXIS_TRIGGER_RIGHT | IS_CONTROLLER_AXIS,             -1, -1, -1, -1, -1, -1, -1, -1, -1}},		// Next weapon
+        {AVK_PREVWEAPON,					{SDL_SCANCODE_X,SDL_CONTROLLER_AXIS_TRIGGER_LEFT | IS_CONTROLLER_AXIS,             -1, -1, -1, -1, -1, -1, -1, -1, -1}},		// Prev weapon
         {AVK_SELECT | AVK_MENU_SELECT,		{SDL_SCANCODE_RETURN,SDL_CONTROLLER_BUTTON_A | IS_CONTROLLER_BUTTON,      -1, -1, -1, -1, -1, -1, -1, -1, -1}},  // Attack/Talk/Use
         {AVK_PASSTURN,						{SDL_SCANCODE_C,SDL_CONTROLLER_BUTTON_X | IS_CONTROLLER_BUTTON,           -1, -1, -1, -1, -1, -1, -1, -1, -1}},		// Pass Turn
         {AVK_AUTOMAP,						{SDL_SCANCODE_TAB,SDL_CONTROLLER_BUTTON_BACK | IS_CONTROLLER_BUTTON,       -1, -1, -1, -1, -1, -1, -1, -1, -1}},	    // Automap
         {AVK_MENUOPEN | AVK_MENU_OPEN,		{SDL_SCANCODE_ESCAPE,SDL_CONTROLLER_BUTTON_START | IS_CONTROLLER_BUTTON,  -1, -1, -1, -1, -1, -1, -1, -1, -1}},	// Open menu/back
         {AVK_ITEMS_INFO,                    {SDL_SCANCODE_I,SDL_CONTROLLER_BUTTON_LEFTSHOULDER | IS_CONTROLLER_BUTTON,  -1, -1, -1, -1, -1, -1, -1, -1, -1}},	    // Menu items and info
         {AVK_DRINKS,		                {SDL_SCANCODE_O,SDL_CONTROLLER_BUTTON_RIGHTSHOULDER | IS_CONTROLLER_BUTTON, -1, -1, -1, -1, -1, -1, -1, -1, -1}},	    // Menu Dirnks
-        {AVK_PDA,		                    {SDL_SCANCODE_P, SDL_CONTROLLER_AXIS_TRIGGER_LEFT | IS_CONTROLLER_AXIS,     -1, -1, -1, -1, -1, -1, -1, -1, -1}},	    // Menu PDA
-        {AVK_BOTDISCARD,		            {SDL_SCANCODE_B, SDL_CONTROLLER_AXIS_TRIGGER_RIGHT | IS_CONTROLLER_AXIS,     -1, -1, -1, -1, -1, -1, -1, -1, -1}}	    // Bot discart
+        {AVK_PDA,		                    {SDL_SCANCODE_P, SDL_CONTROLLER_BUTTON_B | IS_CONTROLLER_BUTTON,     -1, -1, -1, -1, -1, -1, -1, -1, -1}},	    // Menu PDA
+        {AVK_BOTDISCARD,		            {SDL_SCANCODE_B, SDL_CONTROLLER_BUTTON_Y | IS_CONTROLLER_BUTTON,     -1, -1, -1, -1, -1, -1, -1, -1, -1}}	    // Bot discart
 };
 
 //--------------------
@@ -696,6 +696,7 @@ void Input::init() {
         SDL_Log("Custom controller db was loaded from: %s", pathToSdl2ControllerDb);
     }
 #endif
+    SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
     std::memcpy(keyMapping, keyMappingDefault, sizeof(keyMapping));
     std::memcpy(keyMappingTemp, keyMappingDefault, sizeof(keyMapping));
