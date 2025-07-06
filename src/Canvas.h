@@ -2,6 +2,7 @@
 #define __CANVAS_H__
 
 #include "Graphics.h"
+#include "SDL_ttf.h"
 
 class Image;
 class Text;
@@ -127,6 +128,7 @@ public:
 	int storyTotalPages;
 	int storyIndexes[4];
 	int fontRenderMode;
+    TTF_Font *ttfFont;
 	Image* imgFont_16p_Light;
 	Image* imgFont_16p_Dark;
 	Image* imgFont_18p_Light;

@@ -1984,7 +1984,56 @@ void Game::loadConfig() {
 
 	if (IS.loadFile(name, LT_FILE)) {
 		if (IS.readInt() == 11) {
-			this->difficulty = IS.readByte();
+
+            bool difficulty = this->difficulty;
+            bool allowSounds = app->sound->allowSounds;
+            bool areSoundsAllowed = allowSounds;
+            int soundFxVolume = app->sound->soundFxVolume;
+            int musicVolume = app->sound->musicVolume;
+            bool vibrateEnabled = app->canvas->vibrateEnabled;
+            bool enableHelp = app->player->enableHelp;
+            int language = app->localization->defaultLanguage;
+            int currentLevelDeaths = app->player->currentLevelDeaths;
+            int totalDeaths = app->player->totalDeaths;
+            int defaultAnimFrames = app->canvas->animFrames;
+            int m_controlLayout = app->canvas->m_controlLayout;
+            int m_controlAlpha = app->canvas->m_controlAlpha;
+            bool isFlipControls = app->canvas->isFlipControls;
+            int helpBitmask = app->player->helpBitmask;
+            int invHelpBitmask = app->player->invHelpBitmask;
+            int ammoHelpBitmask = app->player->ammoHelpBitmask;
+            int weaponHelpBitmask = app->player->weaponHelpBitmask;
+            int armorHelpBitmask = app->player->armorHelpBitmask;
+            int indexes[10];
+            short numLevelLoads[10];
+
+            for (int i = 0; i < 10; ++i) {
+                indexes[i] = app->menuSystem->indexes[i];
+                numLevelLoads[i] = this->numLevelLoads[i];
+            }
+
+            bool recentBriefSave = app->canvas->recentBriefSave;
+            bool hasSeenIntro = this->hasSeenIntro;
+            int currentGrades = app->player->currentGrades;
+            int bestGrades = app->player->bestGrades;
+            int windowMode = sdlGL->windowMode;
+            bool vsync = sdlGL->vSync;
+            int resolutionIndex = sdlGL->resolutionIndex;
+            int vibrationIntensity = gVibrationIntensity;
+            int deadZone = gDeadZone;
+            bool wasInit = _glesObj->isInit;
+
+            keyMapping_t lKeyMapping[KEY_MAPPIN_MAX];
+
+            for (int i = 0; i < KEY_MAPPIN_MAX; i++) {
+                for (int j = 0; j < KEYBINDS_MAX; j++) {
+                    lKeyMapping[i].keyBinds[j] = keyMapping[i].keyBinds[j];
+                }
+            }
+
+            int localAnimFrames = app->canvas->animFrames;
+
+            this->difficulty = IS.readByte();
 			app->sound->allowSounds = IS.readBoolean();
 			app->canvas->areSoundsAllowed = app->sound->allowSounds;
 			app->sound->soundFxVolume = IS.readByte();
@@ -2047,8 +2096,58 @@ void Game::loadConfig() {
 			SDL_memcpy(keyMappingTemp, keyMapping, sizeof(keyMapping));
 
 			if (IS.readInt() != 0xDEADBEEF) {
-				app->Error("Failed marker check in loadConfig()");
-			}
+                this->difficulty = difficulty;
+                app->sound->allowSounds = allowSounds;
+                app->canvas->areSoundsAllowed = areSoundsAllowed;
+                app->sound->soundFxVolume = soundFxVolume;
+                app->sound->musicVolume = musicVolume;
+                app->canvas->vibrateEnabled = vibrateEnabled;
+                app->player->enableHelp = enableHelp;
+                app->localization->setLanguage(language);
+                app->player->currentLevelDeaths = currentLevelDeaths;
+                app->player->totalDeaths = totalDeaths;
+                app->canvas->setAnimFrames(localAnimFrames);
+                app->canvas->m_controlLayout = m_controlLayout;
+                if (app->canvas->m_controlLayout > 2) {
+                    app->canvas->m_controlLayout = 0;
+                }
+                app->canvas->m_controlAlpha = m_controlAlpha;
+                app->canvas->isFlipControls = isFlipControls;
+                app->player->helpBitmask = helpBitmask;
+                app->player->invHelpBitmask = invHelpBitmask;
+                app->player->ammoHelpBitmask = ammoHelpBitmask;
+                app->player->weaponHelpBitmask = weaponHelpBitmask;
+                app->player->armorHelpBitmask = armorHelpBitmask;
+
+                for (int i = 0; i < 10; ++i) {
+                    app->menuSystem->indexes[i] = indexes[i];
+                    this->numLevelLoads[i]= numLevelLoads[i];
+                }
+
+                app->canvas->recentBriefSave = recentBriefSave;
+                this->hasSeenIntro = hasSeenIntro;
+                this->totalPlayTime = totalPlayTime;
+                app->player->currentGrades = currentGrades;
+                app->player->bestGrades = bestGrades;
+                this->lastSaveTime = app->upTimeMs;
+
+                // [GEC] Port Configurations
+                sdlGL->windowMode = windowMode;
+                sdlGL->vSync = vsync;
+                sdlGL->resolutionIndex = resolutionIndex;
+                gVibrationIntensity = vibrationIntensity;
+                gDeadZone = deadZone;
+                _glesObj->isInit = wasInit;
+
+                for (int i = 0; i < KEY_MAPPIN_MAX; i++) {
+                    for (int j = 0; j < KEYBINDS_MAX; j++) {
+                        keyMapping[i].keyBinds[j] = lKeyMapping[i].keyBinds[j];
+                    }
+                }
+
+                SDL_memcpy(keyMappingTemp, keyMapping, sizeof(keyMapping));
+                this->saveConfig();
+            }
 			IS.close();
 			app->sound->updateVolume();
 		}
@@ -2319,7 +2418,6 @@ void Game::removeState(bool b) {
 }
 
 void Game::saveEmptyConfig() {
-    return;
 	Applet* app = CAppContainer::getInstance()->app;
 	SDLGL* sdlGL = CAppContainer::getInstance()->sdlGL;
 	OutputStream OS;
