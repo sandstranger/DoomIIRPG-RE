@@ -1984,7 +1984,6 @@ void Game::loadConfig() {
 
 	if (IS.loadFile(name, LT_FILE)) {
 		if (IS.readInt() == 11) {
-
             bool difficulty = this->difficulty;
             bool allowSounds = app->sound->allowSounds;
             bool areSoundsAllowed = allowSounds;
@@ -2007,10 +2006,8 @@ void Game::loadConfig() {
             int indexes[10];
             short numLevelLoads[10];
 
-            for (int i = 0; i < 10; ++i) {
-                indexes[i] = app->menuSystem->indexes[i];
-                numLevelLoads[i] = this->numLevelLoads[i];
-            }
+            SDL_memcpy(indexes, app->menuSystem->indexes, sizeof(indexes));
+            SDL_memcpy(numLevelLoads, this->numLevelLoads, sizeof(numLevelLoads));
 
             bool recentBriefSave = app->canvas->recentBriefSave;
             bool hasSeenIntro = this->hasSeenIntro;
@@ -2022,17 +2019,11 @@ void Game::loadConfig() {
             int vibrationIntensity = gVibrationIntensity;
             int deadZone = gDeadZone;
             bool wasInit = _glesObj->isInit;
-
             keyMapping_t lKeyMapping[KEY_MAPPIN_MAX];
-
-            for (int i = 0; i < KEY_MAPPIN_MAX; i++) {
-                for (int j = 0; j < KEYBINDS_MAX; j++) {
-                    lKeyMapping[i].keyBinds[j] = keyMapping[i].keyBinds[j];
-                }
-            }
-
             int localAnimFrames = app->canvas->animFrames;
 
+            SDL_memcpy(lKeyMapping, keyMapping, sizeof(keyMapping));
+            
             this->difficulty = IS.readByte();
 			app->sound->allowSounds = IS.readBoolean();
 			app->canvas->areSoundsAllowed = app->sound->allowSounds;
@@ -2119,10 +2110,8 @@ void Game::loadConfig() {
                 app->player->weaponHelpBitmask = weaponHelpBitmask;
                 app->player->armorHelpBitmask = armorHelpBitmask;
 
-                for (int i = 0; i < 10; ++i) {
-                    app->menuSystem->indexes[i] = indexes[i];
-                    this->numLevelLoads[i]= numLevelLoads[i];
-                }
+                SDL_memcpy(app->menuSystem->indexes, indexes, sizeof(indexes));
+                SDL_memcpy(this->numLevelLoads, numLevelLoads, sizeof(numLevelLoads));
 
                 app->canvas->recentBriefSave = recentBriefSave;
                 this->hasSeenIntro = hasSeenIntro;
@@ -2139,12 +2128,7 @@ void Game::loadConfig() {
                 gDeadZone = deadZone;
                 _glesObj->isInit = wasInit;
 
-                for (int i = 0; i < KEY_MAPPIN_MAX; i++) {
-                    for (int j = 0; j < KEYBINDS_MAX; j++) {
-                        keyMapping[i].keyBinds[j] = lKeyMapping[i].keyBinds[j];
-                    }
-                }
-
+                SDL_memcpy(keyMapping, lKeyMapping, sizeof(keyMapping));
                 SDL_memcpy(keyMappingTemp, keyMapping, sizeof(keyMapping));
                 this->saveConfig();
             }
