@@ -31,17 +31,22 @@
 #ifdef ANDROID
 #include <algorithm>
 #endif
+#include <cstdlib>
+#include <string>
 
 Canvas::Canvas() {
 	std::memset(this, 0, sizeof(Canvas));
 }
 
 Canvas::~Canvas() {
+    TTF_CloseFont(ttfFont);
+    TTF_Quit();
 }
 
 bool Canvas::isLoaded;
 
 bool Canvas::startup() {
+    TTF_Init();
 	Applet* app = CAppContainer::getInstance()->app;
 	int viewWidth, viewHeight;
 	fmButton* button;
@@ -167,7 +172,10 @@ bool Canvas::startup() {
 		this->tellAFriend = false;
 
 		app->beginImageLoading();
-		this->imgDialogScroll = app->loadImage("DialogScroll.bmp", true);
+        std::string pathToTTFFont = std::getenv("ANDROID_GAME_PATH");
+        pathToTTFFont +="/UnifontExMono.ttf";
+        this->ttfFont = TTF_OpenFont(pathToTTFFont.c_str(), 16);
+        this->imgDialogScroll = app->loadImage("DialogScroll.bmp", true);
 		this->imgFabricBG = app->loadImage("FabricBG.bmp", true);
 		this->imgFont = app->loadImage("Font.bmp", true);
 		this->imgEndOfLevelStatsBG = app->loadImage("endOfLevelStatsBG.bmp", true);

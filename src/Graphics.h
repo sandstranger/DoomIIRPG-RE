@@ -1,14 +1,48 @@
+#include <SDL_pixels.h>
+#include <SDL_opengl.h>
+#include "SDL_ttf.h"
+#include <unordered_map>
+
 #ifndef __GRAPHICS_H__
 #define __GRAPHICS_H__
+#define GLYPH_CACHE_SIZE 1024
+#define GLYPH_CACHE_MAX_SIZE 758
+#define OUTLINE_THICKNESS 1
 
 class IDIB;
 class Image;
 class Text;
 
+typedef struct GlyphCacheItem {
+    Uint32 codePoint;
+    TTF_Font* font;
+    Image *image;
+    int advance;
+    struct GlyphCacheItem* hash_next;
+    struct GlyphCacheItem* lru_prev;
+    struct GlyphCacheItem* lru_next;
+} GlyphCacheItem;
+
+typedef struct GlyphCache {
+    GlyphCacheItem* buckets[GLYPH_CACHE_SIZE];
+    GlyphCacheItem* lru_head;
+    GlyphCacheItem* lru_tail;
+    int count;
+} GlyphCache;
+
 class Graphics
 {
 private:
-	
+    GlyphCache* glyphCache;
+    void initGlyphCache();
+    void lru_touch(GlyphCache* cache, GlyphCacheItem* item);
+    void lru_evict(GlyphCache* cache);
+    GlyphCacheItem* GlyphCache_Find(Uint32 codePoint, TTF_Font* font);
+    void GlyphCache_Add(Uint32 codePoint, TTF_Font* font,Image *image,int advance);
+    GLuint CreateGlyphTexture(TTF_Font* font, Uint32 codePoint, int* outAdvance);
+    void renderGlyph(char c,int x, int y, int rotateMode);
+    void drawStringTTF(Text* text, int x, int y, int h, int flags, int strBeg, int strEnd);
+    Uint32 utf8_to_ucs4(const char *utf8, int *advance);
 public:
 
 	static constexpr short ANCHORS_NONE = 0;
