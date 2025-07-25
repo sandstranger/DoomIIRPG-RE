@@ -90,9 +90,9 @@ public:
 	void fillRegion(Image* img, int x, int y, int w, int h, int rotateMode);
 	void fillRegion(Image* img, int texX, int texY, int texW, int texH, int x, int y, int w, int h, int rotateMode);
 	void drawBevel(int color1, int color2, int x, int y, int w, int h);
-	void drawString(Text* text, int x, int y, int flags);
-	void drawString(Text* text, int x, int y, int flags, int strBeg, int strEnd);
-	void drawString(Text* text, int x, int y, int h, int flags, int strBeg, int strEnd);
+	void drawString(Text* text, int x, int y, int flags, bool translateText = true);
+	void drawString(Text* text, int x, int y, int flags, int strBeg, int strEnd, bool translateText = true);
+	void drawString(Text* text, int x, int y, int h, int flags, int strBeg, int strEnd, bool translateText = true);
 	void drawString(Image* img, Text* text, int x, int y, int h, int flags, int strBeg, int strEnd);
 	void drawChar(Image* img, char c, int x, int y, int rotateMode);
 	void drawBuffIcon(int texY, int posX, int posY, int flags);

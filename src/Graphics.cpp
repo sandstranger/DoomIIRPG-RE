@@ -735,21 +735,27 @@ void Graphics::renderGlyph(wchar_t c,int x, int y, int rotateMode) {
                              x, y - 3, rotateMode, renderMode);
 }
 
-void Graphics::drawString(Text* text, int x, int y, int flags) {
+void Graphics::drawString(Text* text, int x, int y, int flags, bool translateText) {
     Canvas* canvas = CAppContainer::getInstance()->app->canvas;
-    text->translateText();
+    if (translateText){
+        text->translateText();
+    }
     this->drawString(canvas->imgFont, text, x, y, 16, flags, 0, text->length());
 }
 
-void Graphics::drawString(Text* text, int x, int y, int flags, int strBeg, int strEnd) {
+void Graphics::drawString(Text* text, int x, int y, int flags, int strBeg, int strEnd, bool translateText) {
     Canvas* canvas = CAppContainer::getInstance()->app->canvas;
-    text->translateText();
+    if (translateText) {
+        text->translateText();
+    }
     this->drawString(canvas->imgFont, text, x, y, 16, flags, strBeg, strEnd);
 }
 
-void Graphics::drawString(Text* text, int x, int y, int h, int flags, int strBeg, int strEnd) {
+void Graphics::drawString(Text* text, int x, int y, int h, int flags, int strBeg, int strEnd, bool translateText) {
     Canvas* canvas = CAppContainer::getInstance()->app->canvas;
-    text->translateText();
+    if (translateText) {
+        text->translateText();
+    }
     this->drawString(canvas->imgFont, text, x, y, h, flags, strBeg, strEnd);
 }
 
@@ -981,7 +987,7 @@ void Graphics::drawCursor(int x, int y, int flags, bool b) {
     else {
         smallBuffer->append('\x84');
     }
-    this->drawString(smallBuffer, x, y, flags);
+    this->drawString(smallBuffer, x, y, flags, false);
     smallBuffer->dispose();
 }
 
