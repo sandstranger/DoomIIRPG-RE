@@ -39,10 +39,8 @@ private:
     void lru_evict(GlyphCache* cache);
     GlyphCacheItem* GlyphCache_Find(Uint32 codePoint, TTF_Font* font);
     void GlyphCache_Add(Uint32 codePoint, TTF_Font* font,Image *image,int advance);
-    GLuint CreateGlyphTexture(TTF_Font* font, Uint32 codePoint, int* outAdvance);
-    void renderGlyph(char c,int x, int y, int rotateMode);
-    void drawStringTTF(Text* text, int x, int y, int h, int flags, int strBeg, int strEnd);
-    Uint32 utf8_to_ucs4(const char *utf8, int *advance);
+    GLuint CreateGlyphTexture(TTF_Font* font, const char* chars, int* outAdvance);
+    void renderGlyph(wchar_t c,int x, int y, int rotateMode);
 public:
 
 	static constexpr short ANCHORS_NONE = 0;

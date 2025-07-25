@@ -129,7 +129,7 @@ public:
 	int storyIndexes[4];
 	int fontRenderMode;
     TTF_Font *ttfFont;
-	Image* imgFont_16p_Light;
+    Image* imgFont_16p_Light;
 	Image* imgFont_16p_Dark;
 	Image* imgFont_18p_Light;
 	Image* imgWarFont;

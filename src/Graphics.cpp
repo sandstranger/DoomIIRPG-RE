@@ -10,6 +10,9 @@
 #include "SDLGL.h"
 #include <string>
 #include <iostream>
+#include <locale>
+#include <codecvt>
+#include <string>
 #ifdef ANDROID
 #include <algorithm>
 #include <cstdio>
@@ -476,58 +479,30 @@ void Graphics::drawBevel(int color1, int color2, int x, int y, int w, int h) {
     this->drawLine(x, y + h, x + w, y + h);
 }
 
-Uint32 Graphics::utf8_to_ucs4(const char *utf8, int *advance) {
-    const unsigned char *p = (const unsigned char *)utf8;
-    Uint32 ch = 0;
+static bool isValidChar(wchar_t ch) {
+    if (ch == L'\0') return false;
 
-    // Если достигнут конец строки
-    if (*p == 0) {
-        *advance = 0;
-        return 0;
+    if (sizeof(wchar_t) == 2) {
+        if (ch >= 0xD800 && ch <= 0xDFFF) return false; // Суррогаты
+        if (ch > 0xFFFF) return false;
+    } else {
+        if (ch > 0x10FFFF) return false; // За пределами Unicode
     }
 
-    // Обрабатываем ASCII символы
-    if (*p < 0x80) {
-        *advance = 1;
-        return *p;
-    }
+    if (std::iswcntrl(ch)) return false;
 
-    // Определяем длину последовательности
-    int len;
-    if ((*p & 0xE0) == 0xC0) len = 2;
-    else if ((*p & 0xF0) == 0xE0) len = 3;
-    else if ((*p & 0xF8) == 0xF0) len = 4;
-    else {
-        *advance = 1;
-        return 0;
-    }
+    return true;
+}
 
-    // Проверяем, что в строке достаточно байтов
-    for (int i = 1; i < len; i++) {
-        if (p[i] == 0 || (p[i] & 0xC0) != 0x80) {
-            *advance = 1;
-            return 0;
-        }
+static const char* wchar_to_char_ptr(wchar_t wch) {
+    static char buffer[8]; // достаточно для любого UTF-8 символа
+    std::mbstate_t state = std::mbstate_t();
+    size_t len = std::wcrtomb(buffer, wch, &state);
+    if (len != static_cast<size_t>(-1)) {
+        buffer[len] = '\0';
+        return buffer;
     }
-
-    // Декодируем символ
-    switch (len) {
-        case 2:
-            ch = ((p[0] & 0x1F) << 6) | (p[1] & 0x3F);
-            if (ch < 0x80) ch = 0; // Overlong sequence
-            break;
-        case 3:
-            ch = ((p[0] & 0x0F) << 12) | ((p[1] & 0x3F) << 6) | (p[2] & 0x3F);
-            if (ch < 0x800) ch = 0; // Overlong sequence
-            break;
-        case 4:
-            ch = ((p[0] & 0x07) << 18) | ((p[1] & 0x3F) << 12) | ((p[2] & 0x3F) << 6) | (p[3] & 0x3F);
-            if (ch < 0x10000) ch = 0; // Overlong sequence
-            break;
-    }
-
-    *advance = len;
-    return ch;
+    return "";
 }
 
 void Graphics::initGlyphCache() {
@@ -637,34 +612,50 @@ void Graphics::GlyphCache_Add(Uint32 codePoint, TTF_Font* font,Image *image,int 
     glyphCache->count++;
 }
 
-GLuint Graphics::CreateGlyphTexture(TTF_Font* font, Uint32 codePoint, int* outAdvance) {
-    char utf8Char[5] = {0};
-    int len = 0;
-    // Кодирование UTF-8 (как в оригинале)
-    if (codePoint <= 0x7F) {
-        utf8Char[0] = (char)codePoint;
-        len = 1;
-    } else if (codePoint <= 0x7FF) {
-        utf8Char[0] = 0xC0 | (codePoint >> 6);
-        utf8Char[1] = 0x80 | (codePoint & 0x3F);
-        len = 2;
-    } else if (codePoint <= 0xFFFF) {
-        utf8Char[0] = 0xE0 | (codePoint >> 12);
-        utf8Char[1] = 0x80 | ((codePoint >> 6) & 0x3F);
-        utf8Char[2] = 0x80 | (codePoint & 0x3F);
-        len = 3;
-    } else if (codePoint <= 0x10FFFF) {
-        utf8Char[0] = 0xF0 | (codePoint >> 18);
-        utf8Char[1] = 0x80 | ((codePoint >> 12) & 0x3F);
-        utf8Char[2] = 0x80 | ((codePoint >> 6) & 0x3F);
-        utf8Char[3] = 0x80 | (codePoint & 0x3F);
-        len = 4;
-    }
-
+GLuint Graphics::CreateGlyphTexture(TTF_Font* font, const char* chars, int* outAdvance) {
     // Рендерим глиф
     SDL_Color sdlColor = {255, 255, 255, 255};
-    SDL_Surface* glyphSurf = TTF_RenderUTF8_Solid(font, utf8Char, sdlColor);
+
+    int outline = 1;
+    SDL_Surface* glyphSurf = TTF_RenderUTF8_Solid(font, chars,sdlColor);
     if (!glyphSurf) return 0;
+
+    *outAdvance = glyphSurf->w;
+    SDL_Surface* outlineSurf = TTF_RenderUTF8_Solid(font, chars, (SDL_Color){0, 0, 0, 255});
+    if (!outlineSurf) {
+        SDL_FreeSurface(glyphSurf);
+        return 0;
+    }
+
+    SDL_Surface* finalSurf = SDL_CreateRGBSurfaceWithFormat(0,
+                                                            glyphSurf->w + 2*outline,
+                                                            glyphSurf->h + 2*outline,
+                                                            32,
+                                                            SDL_PIXELFORMAT_RGBA32);
+
+    if (!finalSurf) {
+        SDL_FreeSurface(glyphSurf);
+        SDL_FreeSurface(outlineSurf);
+        return 0;
+    }
+
+    SDL_FillRect(finalSurf, NULL, SDL_MapRGBA(finalSurf->format, 0, 0, 0, 0));
+
+    // Рендерим обводку
+    SDL_Rect dest = {0, 0, outlineSurf->w, outlineSurf->h};
+    for (int oy = -outline; oy <= outline; oy++) {
+        for (int ox = -outline; ox <= outline; ox++) {
+            if (ox == 0 && oy == 0) continue;
+            dest.x = outline + ox;
+            dest.y = outline + oy;
+            SDL_BlitSurface(outlineSurf, NULL, finalSurf, &dest);
+        }
+    }
+
+    // Рендерим основной символ
+    dest.x = outline;
+    dest.y = outline;
+    SDL_BlitSurface(glyphSurf, NULL, finalSurf, &dest);
 
     GLuint textureID;
     glGenTextures(1, &textureID);
@@ -676,33 +667,36 @@ GLuint Graphics::CreateGlyphTexture(TTF_Font* font, Uint32 codePoint, int* outAd
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
     // Конвертируем в RGBA
-    SDL_Surface* rgbaSurf = SDL_CreateRGBSurfaceWithFormat(0, glyphSurf->w, glyphSurf->h, 32, SDL_PIXELFORMAT_RGBA32);
-    SDL_BlitSurface(glyphSurf, nullptr, rgbaSurf, nullptr);
+    SDL_Surface* rgbaSurf = SDL_CreateRGBSurfaceWithFormat(0, finalSurf->w, finalSurf->h, 32, SDL_PIXELFORMAT_RGBA32);
+    SDL_BlitSurface(finalSurf, nullptr, rgbaSurf, nullptr);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, glyphSurf->w, glyphSurf->h, 0,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, finalSurf->w, finalSurf->h, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, rgbaSurf->pixels);
 
-    *outAdvance = glyphSurf->w;
+    *outAdvance = finalSurf->w;
 
     SDL_FreeSurface(glyphSurf);
+    SDL_FreeSurface(outlineSurf);
+    SDL_FreeSurface(finalSurf);
     SDL_FreeSurface(rgbaSurf);
 
     return textureID;
 }
 
-void Graphics::renderGlyph(char c,int x, int y, int rotateMode) {
+void Graphics::renderGlyph(wchar_t c,int x, int y, int rotateMode) {
+    auto chars = wchar_to_char_ptr(c);
     auto font = CAppContainer::getInstance()->app->canvas->ttfFont;
     GlyphCacheItem* item = GlyphCache_Find(c, font);
     if (!item) {
         int advance;
 
-        GLuint textureID = CreateGlyphTexture(font, c, &advance);
+        GLuint textureID = CreateGlyphTexture(font, chars, &advance);
         if (!textureID) {
             return;
         }
 
         int w, h;
-        TTF_SizeUTF8(font, "W", &w, &h); // Примерный размер
+        TTF_SizeUTF8(font, chars, &w, &h); // Примерный размер
 
         Image *image = (Image*)malloc(sizeof(Image));
         image->piDIB = (IDIB*)malloc(sizeof(IDIB));
@@ -717,12 +711,9 @@ void Graphics::renderGlyph(char c,int x, int y, int rotateMode) {
         GlyphCache_Add(c, font, image, advance);
         item = GlyphCache_Find(c, font);
         if (!item) {
-            SDL_Log("CALLED");
             return;
         }
     }
-
-    //SDL_Log("CALLED");
 
     // Определяем renderMode как в оригинале
     int renderMode = 0;
@@ -759,167 +750,8 @@ void Graphics::drawString(Text* text, int x, int y, int h, int flags, int strBeg
     this->drawString(canvas->imgFont, text, x, y, h, flags, strBeg, strEnd);
 }
 
-void Graphics::drawStringTTF( Text* text, int x, int y, int h, int flags, int strBeg, int strEnd) {
-    int rotateMode = 0;
-
-    if (text == nullptr) {
-        return;
-    }
-
-    if (strEnd == -1) {
-        strEnd = text->length();
-    }
-
-    if (strEnd == 0) {
-        return;
-    }
-
-    if (flags & 0x40) {
-        rotateMode = 3;
-    }
-
-    int stringWidth = text->getStringWidth(strBeg, strBeg + strEnd, false);
-    int n6 = x;
-
-    if (rotateMode == 3) {
-        n6 = y;
-    }
-
-    if ((flags & 0x8) != 0x0) {
-        if (rotateMode == 3) {
-            y += stringWidth;
-            n6 = y;
-        }
-        else {
-            x -= stringWidth;
-            n6 = x;
-        }
-    }
-    else if ((flags & 0x1) != 0x0) {
-        if (rotateMode == 3) {
-            y += stringWidth / 2 + (stringWidth & 0x1);
-        }
-        else {
-            x -= stringWidth / 2 + (stringWidth & 0x1);
-        }
-
-    }
-    if ((flags & 0x20) != 0x0) {
-        if (rotateMode == 3) {
-            x += h;
-        }
-        else {
-            y -= h;
-        }
-    }
-    else if ((flags & 0x2) != 0x0) {
-        if (rotateMode == 3) {
-            x -= h * text->getNumLines() / 2;
-        }
-        else {
-            y -= h * text->getNumLines() / 2;
-        }
-    }
-
-    int n7 = strBeg + std::min(strEnd, text->length() - strBeg);
-    for (int i = strBeg; i < n7; ++i) {
-        char char1 = text->charAt(i);
-        std::wstring char1String (sizeof (char1), char1);
-        if (char1 == '\n' || char1 == '|') {
-
-            if (rotateMode == 3) {
-                x += h;
-            }
-            else {
-                y += h;
-            }
-
-            if ((flags & 0x1) != 0x0) {
-                if (rotateMode == 3) {
-                    y = n6 + text->getStringWidth(i + 1, n7, false) / 2;
-                }
-                else {
-                    x = n6 - text->getStringWidth(i + 1, n7, false) / 2;
-                }
-            }
-            else {
-                if (rotateMode == 3) {
-                    y = n6;
-                }
-                else {
-                    x = n6;
-                }
-            }
-        }
-        else if (char1 == ' ' || char1String == L"\u00A0") {
-            if (rotateMode == 3) {
-                y -= 9;
-            }
-            else {
-                x += 9;
-            }
-        }
-        else {
-            if (char1 == '\\'/* && i < n7*/) {
-                char char2 = text->charAt(++i);
-                int n8 = char2 - 'A';
-                if (n8 < 0 || n8 >= 15) {
-                    if (rotateMode == 3) {
-                        renderGlyph(char2, x, y, rotateMode);
-//                        this->drawChar(img, char2, x, y, rotateMode);
-                        y -= 9;
-                    }
-                    else {
-                        renderGlyph(char2, x, y, rotateMode);
-//                        this->drawChar(img, char2, x, y, rotateMode);
-                        x += 9;
-                    }
-                }
-                else {
-                    this->drawBuffIcon(n8, x, y, 0);
-                    if (rotateMode == 3) {
-                        y -= 9;
-                    }
-                    else {
-                        x += (9 * 3);
-                    }
-                }
-            }
-            else if (char1 == '^'/* && i < n7*/) {
-                short currentCharColor = (short)(text->charAt(++i) - '0');
-                if (currentCharColor >= 0 && currentCharColor <= 9) {
-                    this->currentCharColor = currentCharColor;
-                    continue;
-                }
-                if (rotateMode == 3) {
-                    renderGlyph('^',x, y, rotateMode);
-//                    this->drawChar(img, '^', x, y, rotateMode);
-                    y -= 9;
-                }
-                else {
-                    this->renderGlyph( '^', x, y, rotateMode);
-                    x += 9;
-                }
-                //--i;
-            }
-            else {
-                if (rotateMode == 3) {
-                    this->renderGlyph( char1, x, y, rotateMode);
-                    y -= 9;
-                }
-                else {
-                    this->renderGlyph( char1, x, y, rotateMode);
-                    x += 9;
-                }
-            }
-        }
-    }
-    this->currentCharColor = 0;
-}
-
 void Graphics::drawString(Image* img, Text* text, int x, int y, int h, int flags, int strBeg, int strEnd) {
-    drawStringTTF(text, x,y,h,flags,strBeg,strEnd);
-    return;
+    bool useTTFRendering = CAppContainer::getInstance()->app->localization->enableSDLTTF;
     int rotateMode = 0;
 
     if (text == nullptr) {
@@ -983,7 +815,7 @@ void Graphics::drawString(Image* img, Text* text, int x, int y, int h, int flags
 
     int n7 = strBeg + std::min(strEnd, text->length() - strBeg);
     for (int i = strBeg; i < n7; ++i) {
-        char char1 = text->charAt(i);
+        auto char1 = text->charAt(i);
         std::wstring char1String (sizeof (char1), char1);
         if (char1 == '\n' || char1 == '|') {
 
@@ -1021,15 +853,24 @@ void Graphics::drawString(Image* img, Text* text, int x, int y, int h, int flags
         }
         else {
             if (char1 == '\\'/* && i < n7*/) {
-                char char2 = text->charAt(++i);
+                auto char2 = text->charAt(++i);
+                bool drawCharAsTTFSymbol = useTTFRendering && isValidChar(char2);
                 int n8 = char2 - 'A';
                 if (n8 < 0 || n8 >= 15) {
                     if (rotateMode == 3) {
-                        this->drawChar(img, char2, x, y, rotateMode);
+                        if (drawCharAsTTFSymbol){
+                            renderGlyph(char2,x,y,rotateMode);
+                        } else{
+                            this->drawChar(img, char2, x, y, rotateMode);
+                        }
                         y -= 9;
                     }
                     else {
-                        this->drawChar(img, char2, x, y, rotateMode);
+                        if (drawCharAsTTFSymbol) {
+                            renderGlyph(char2, x, y, rotateMode);
+                        } else{
+                            this->drawChar(img, char2, x, y, rotateMode);
+                        }
                         x += 9;
                     }
                 }
@@ -1050,22 +891,38 @@ void Graphics::drawString(Image* img, Text* text, int x, int y, int h, int flags
                     continue;
                 }
                 if (rotateMode == 3) {
-                    this->drawChar(img, '^', x, y, rotateMode);
+                    if (useTTFRendering){
+                        renderGlyph('^', x, y, rotateMode);
+                    } else{
+                        this->drawChar(img, '^', x, y, rotateMode);
+                    }
                     y -= 9;
                 }
                 else {
-                    this->drawChar(img, '^', x, y, rotateMode);
+                    if (useTTFRendering){
+                        renderGlyph('^', x, y, rotateMode);
+                    } else{
+                        this->drawChar(img, '^', x, y, rotateMode);
+                    }
                     x += 9;
                 }
                 //--i;
             }
             else {
                 if (rotateMode == 3) {
-                    this->drawChar(img, char1, x, y, rotateMode);
+                    if (useTTFRendering && isValidChar(char1)){
+                        renderGlyph(char1,x,y,rotateMode);
+                    } else{
+                        this->drawChar(img, char1, x, y, rotateMode);
+                    }
                     y -= 9;
                 }
                 else {
-                    this->drawChar(img, char1, x, y, rotateMode);
+                    if (useTTFRendering && isValidChar(char1)){
+                        renderGlyph(char1,x,y,rotateMode);
+                    } else{
+                        this->drawChar(img, char1, x, y, rotateMode);
+                    }
                     x += 9;
                 }
             }

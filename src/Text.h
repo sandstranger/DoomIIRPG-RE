@@ -1,6 +1,9 @@
 #ifndef __TEXT_H__
 #define __TEXT_H__
 
+#include <string>
+using namespace std;
+
 class Text;
 class InputStream;
 
@@ -16,24 +19,11 @@ public:
 	static constexpr int MAXBUFFERS = 7;
 	static constexpr int MAXTEXT = 15;
 	static constexpr int MAX_STRING_ARGS = 50;
-	static constexpr uint8_t C_LINE = '\x80';
-	static constexpr uint8_t C_ELLIPSES = '\x85';
-	static constexpr uint8_t C_RED_ING = '¼';
-	static constexpr uint8_t C_BLUE_ING = '½';
-	static constexpr uint8_t C_GREEN_ING = '¾';
-	static constexpr uint8_t C_CHECK = '\x87';
-	static constexpr uint8_t C_MINIDASH = '\x88';
-	static constexpr uint8_t C_CURSOR2 = '\x84';
-	static constexpr uint8_t C_CURSOR = '\x8a';
-	static constexpr uint8_t C_POINTER = '\x90';
-	static constexpr uint8_t C_GREYLINE = '\x89';
-	static constexpr uint8_t C_HEART = '\x8d';
-	static constexpr uint8_t C_SHIELD = '\x8b';
 	static constexpr uint8_t HYPHEN = '-';
-	static constexpr uint8_t NEWLINE = '|';
-	static constexpr uint8_t HARD_SPACE = ' ';
 
-	Text* scratchBuffers[Localization::MAXBUFFERS];
+    bool enableSDLTTF;
+    bool enableMachineTextTranslation;
+    Text* scratchBuffers[Localization::MAXBUFFERS];
 	int bufferFlags;
 	Text* dynamicArgs;
 	int16_t argIndex[Localization::MAX_STRING_ARGS];
@@ -98,7 +88,7 @@ class Text
 private:
 
 public:
-	char* chars;
+	wchar_t * chars;
 	int _length;
 	int stringWidth;
 
@@ -111,7 +101,7 @@ public:
 	int length();
 	void setLength(int i);
 	Text* deleteAt(int i, int i2);
-	char charAt(int i);
+    wchar_t charAt(int i);
 	void setCharAt(char c, int i);
 	Text* append(char c);
 	Text* append(uint8_t c);

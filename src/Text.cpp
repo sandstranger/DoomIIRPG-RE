@@ -16,6 +16,8 @@
 
 Localization::Localization() {
 	std::memset(this, 0, sizeof(Localization));
+    enableMachineTextTranslation = strcmp(getenv("ENABLE_TEXTS_MACHINE_TRANSLATION"), "true") == 0;
+    enableSDLTTF = strcmp(getenv("ENABLE_SDL_TTF"), "true") == 0 || enableMachineTextTranslation;
 }
 
 Localization::~Localization() {
@@ -523,8 +525,8 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 Text::Text(int countChars) {
 	printf("Text::init\n");
 
-	this->chars = new char[countChars];
-	std::memset(this->chars, 0, countChars);
+	this->chars = new wchar_t [countChars];
+	std::wmemset(this->chars, 0, countChars);
 	this->_length = 0;
 	this->chars[0] = '\0';
 	this->stringWidth = -1;
@@ -552,13 +554,13 @@ void Text::setLength(int i) {
 }
 
 Text* Text::deleteAt(int i, int i2) {
-	std::memcpy(this->chars + i, this->chars + i + i2, this->_length - (i + i2));
+    std::wmemcpy(this->chars + i,this->chars + i + i2,this->_length - (i + i2));
 	this->_length -= i2;
 	this->chars[this->_length] = '\0';
 	return this;
 }
 
-char Text::charAt(int i) {
+wchar_t Text::charAt(int i) {
 	return this->chars[i];
 }
 
@@ -758,7 +760,8 @@ int Text::wrapText(int i, int i2, char c) {
 
 int Text::wrapText(int i, int i2, int i3, char c) {
 	char wordBreaks[5];
-	char* chars, n8;
+	char n8;
+    wchar_t * chars;
 	bool n9;
 	int length, n4, n5, n6, n7, n10, n11, n12;
 
