@@ -86,9 +86,12 @@ public:
 class Text
 {
 private:
-
+    bool isTranslated;
+    bool containsValidChars();
 public:
-	wchar_t * chars;
+	wchar_t *chars;
+    wchar_t *translatedChars;
+    int _translatedLength;
 	int _length;
 	int stringWidth;
 
@@ -99,6 +102,7 @@ public:
 
 	bool startup();
 	int length();
+    void translateText();
 	void setLength(int i);
 	Text* deleteAt(int i, int i2);
     wchar_t charAt(int i);

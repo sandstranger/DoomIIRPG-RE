@@ -737,16 +737,19 @@ void Graphics::renderGlyph(wchar_t c,int x, int y, int rotateMode) {
 
 void Graphics::drawString(Text* text, int x, int y, int flags) {
     Canvas* canvas = CAppContainer::getInstance()->app->canvas;
+    text->translateText();
     this->drawString(canvas->imgFont, text, x, y, 16, flags, 0, text->length());
 }
 
 void Graphics::drawString(Text* text, int x, int y, int flags, int strBeg, int strEnd) {
     Canvas* canvas = CAppContainer::getInstance()->app->canvas;
+    text->translateText();
     this->drawString(canvas->imgFont, text, x, y, 16, flags, strBeg, strEnd);
 }
 
 void Graphics::drawString(Text* text, int x, int y, int h, int flags, int strBeg, int strEnd) {
     Canvas* canvas = CAppContainer::getInstance()->app->canvas;
+    text->translateText();
     this->drawString(canvas->imgFont, text, x, y, h, flags, strBeg, strEnd);
 }
 
