@@ -1819,7 +1819,7 @@ void Canvas::loadMap(int loadMapID, bool b, bool tm_NewGame) {
 void Canvas::updatePrologueLines(Text* text) {
     int n3 = (this->displayRect[3] - 40) / 21;
     this->storyTotalPages = 0;
-
+    this->storyIndexes[this->storyTotalPages++] = 0;
     int n4 = 0;
     int first = 0;
     while ((first = text->findFirstOf('|', first)) != -1) {
