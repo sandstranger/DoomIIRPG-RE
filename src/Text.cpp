@@ -7,6 +7,7 @@
 #include "JavaStream.h"
 #include "Resource.h"
 #include "Translator.h"
+#include "SDL_log.h"
 #include <locale>
 #include <codecvt>
 #include <string>
@@ -543,10 +544,35 @@ Text::Text(int countChars) {
 Text::~Text() {
 }
 
-static const char* wchar_to_utf8(const wchar_t* wide_str) {
+static bool isValidChar(wchar_t ch) {
+    if (ch == L'\0') return false;
+
+    if (sizeof(wchar_t) == 2) {
+        if (ch >= 0xD800 && ch <= 0xDFFF) return false; // Суррогаты
+        if (ch > 0xFFFF) return false;
+    } else {
+        if (ch > 0x10FFFF) return false; // За пределами Unicode
+    }
+
+    if (std::iswcntrl(ch)) return false;
+
+    return true;
+}
+
+static const char *wchar_to_utf8(const wchar_t *wide_str, int length) {
     static thread_local std::string buffer;
+    buffer.clear();
+    buffer.reserve(length);
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    buffer = converter.to_bytes(wide_str);
+    for (int i = 0; i < length; i++) {
+        try {
+            if (isValidChar(wide_str[i])) {
+                buffer.append(converter.to_bytes(wide_str[i]));
+            }
+        }
+        catch (...) {
+        }
+    }
     return buffer.c_str();
 }
 
@@ -566,21 +592,6 @@ static wchar_t* char_to_wchar(const char* utf8_str) {
     }
 }
 
-static bool isValidChar(wchar_t ch) {
-    if (ch == L'\0') return false;
-
-    if (sizeof(wchar_t) == 2) {
-        if (ch >= 0xD800 && ch <= 0xDFFF) return false; // Суррогаты
-        if (ch > 0xFFFF) return false;
-    } else {
-        if (ch > 0x10FFFF) return false; // За пределами Unicode
-    }
-
-    if (std::iswcntrl(ch)) return false;
-
-    return true;
-}
-
 bool Text::containsValidChars() {
     for (int i = 0; i<_length; i++) {
         if (isValidChar(chars[i])){
@@ -598,7 +609,12 @@ void Text::translateText() {
         return;
     }
 
-    auto charsArray = wchar_to_utf8(chars);
+    auto charsArray = wchar_to_utf8(chars, _length);
+
+    if (!charsArray || strlen(charsArray) == 0){
+        return;
+    }
+
     auto translatedCharsArray = translate(charsArray, false);
 
     isTranslated = strcmp(charsArray, translatedCharsArray) != 0;

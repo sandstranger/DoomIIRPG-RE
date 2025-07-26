@@ -571,65 +571,65 @@ void Canvas::backPaint(Graphics* graphics) {
 			largeBuffer->append("Rndr ms: ");
 			largeBuffer->append(this->st_fields[0] / this->st_count)->append('.');
 			largeBuffer->append(this->st_fields[0] * 100 / this->st_count - this->st_fields[0] / this->st_count * 100);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			largeBuffer->setLength(0);
 			largeBuffer->append("Bsp ms: ");
 			largeBuffer->append(this->st_fields[1] / this->st_count)->append('.');
 			largeBuffer->append(this->st_fields[1] * 100 / this->st_count - this->st_fields[1] / this->st_count * 100);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			largeBuffer->setLength(0);
 			largeBuffer->append("Hud ms: ");
 			largeBuffer->append(this->st_fields[2] / this->st_count)->append('.');
 			largeBuffer->append(this->st_fields[2] * 100 / this->st_count - this->st_fields[2] / this->st_count * 100);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			int n2 = this->st_fields[4] + this->st_fields[5];
 			largeBuffer->setLength(0);
 			largeBuffer->append("Blit ms: ");
 			largeBuffer->append(n2 / this->st_count)->append('.');
 			largeBuffer->append(n2 * 100 / this->st_count - n2 / this->st_count * 100);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			largeBuffer->setLength(0);
 			largeBuffer->append("Paus ms: ");
 			largeBuffer->append(this->st_fields[6] / this->st_count)->append('.');
 			largeBuffer->append(this->st_fields[6] * 100 / this->st_count - this->st_fields[6] / this->st_count * 100);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			largeBuffer->setLength(0);
 			largeBuffer->append("Dbg ms: ");
 			largeBuffer->append(this->st_fields[9] / this->st_count)->append('.');
 			largeBuffer->append(this->st_fields[9] * 100 / this->st_count - this->st_fields[9] / this->st_count * 100);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			largeBuffer->setLength(0);
 			largeBuffer->append("Loop ms: ");
 			largeBuffer->append(this->st_fields[7] / this->st_count)->append('.');
 			largeBuffer->append(this->st_fields[7] * 100 / this->st_count - this->st_fields[7] / this->st_count * 100);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			largeBuffer->setLength(0);
 			largeBuffer->append("Key ms: ");
 			largeBuffer->append(this->st_fields[11] - this->st_fields[10]);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			largeBuffer->setLength(0);
 			largeBuffer->append("State ms: ");
 			largeBuffer->append(this->st_fields[12] / this->st_count)->append('.');
 			largeBuffer->append(this->st_fields[12] * 100 / this->st_count - this->st_fields[12] / this->st_count * 100);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			largeBuffer->setLength(0);
 			largeBuffer->append("Totl ms: ");
 			largeBuffer->append(this->st_fields[8] / this->st_count)->append('.');
 			largeBuffer->append(this->st_fields[8] * 100 / this->st_count - this->st_fields[8] / this->st_count * 100);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			largeBuffer->setLength(0);
 			largeBuffer->append(this->st_count);
-			graphics->drawString(largeBuffer, this->viewRect[0], n, 0);
+			graphics->drawString(largeBuffer, this->viewRect[0], n, 0, false);
 			n += 16;
 			this->debugTime = app->upTimeMs - this->debugTime;
 			largeBuffer->dispose();
@@ -652,20 +652,20 @@ void Canvas::backPaint(Graphics* graphics) {
 			largeBuffer2->append(app->render->clearColorBuffer)->append('/');
 			largeBuffer2->append(app->render->bltTime)->append('/');
 			largeBuffer2->append(n4);
-			graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0);
+			graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0, false);
 			n3 += 16;
 			largeBuffer2->setLength(0);
 			largeBuffer2->append("li: ");
 			largeBuffer2->append(app->render->lineRasterCount)->append('/');
 			largeBuffer2->append(app->render->lineCount);
-			graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0);
+			graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0, false);
 			n3 += Applet::FONT_HEIGHT[app->fontType];
 			largeBuffer2->setLength(0);
 			largeBuffer2->append("sp: ");
 			largeBuffer2->append(app->render->spriteRasterCount)->append('/');
 			largeBuffer2->append(app->render->spriteCount)->append('/');
 			largeBuffer2->append(app->render->numMapSprites);
-			graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0);
+			graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0, false);
 			n3 += Applet::FONT_HEIGHT[app->fontType];
 			if (app->render->renderMode == 63) {
 				largeBuffer2->setLength(0);
@@ -678,7 +678,7 @@ void Canvas::backPaint(Graphics* graphics) {
 				largeBuffer2->append("tris: ");
 				largeBuffer2->append(app->tinyGL->countBackFace)->append('/');
 				largeBuffer2->append(app->tinyGL->countDrawn);
-				graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0);
+				graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0, false);
 				n3 += Applet::FONT_HEIGHT[app->fontType];
 			}
 			largeBuffer2->setLength(0);
@@ -688,7 +688,7 @@ void Canvas::backPaint(Graphics* graphics) {
 				v30 += app->osTime[i];
 			}
 			largeBuffer2->append(v30 / 8);
-			graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0);
+			graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0, false);
 			n3 += Applet::FONT_HEIGHT[app->fontType];
 			largeBuffer2->setLength(0);
 			largeBuffer2->append("Code: ");
@@ -697,7 +697,7 @@ void Canvas::backPaint(Graphics* graphics) {
 				v31 += app->codeTime[i];
 			}
 			largeBuffer2->append(v31 / 8);
-			graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0);
+			graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0, false);
 			largeBuffer2->dispose();
 			n3 += Applet::FONT_HEIGHT[app->fontType];
 		}
@@ -734,7 +734,7 @@ void Canvas::backPaint(Graphics* graphics) {
 			else if (angle == Enums::ANGLE_SOUTHWEST) {
 				smallBuffer->append("SW");
 			}
-			graphics->drawString(smallBuffer, this->viewRect[0], n3, 0);
+			graphics->drawString(smallBuffer, this->viewRect[0], n3, 0, false);
 			smallBuffer->dispose();
 		}
 	}
@@ -766,13 +766,14 @@ void Canvas::backPaint(Graphics* graphics) {
 			largeBuffer3->append(this->updateChar);
 			largeBuffer3->append(" ");
 			largeBuffer3->append(1000000000/*App.getFreeMemory()*/);
-			graphics->drawString(largeBuffer3, this->SCR_CX, this->viewRect[1] + this->viewRect[3] - 16, 17);
+			graphics->drawString(largeBuffer3, this->SCR_CX, this->viewRect[1] + this->viewRect[3] - 16, 17,
+                                 false);
 			largeBuffer3->setLength(0);
 			for (int i = 0; i < 10; ++i) {
 				largeBuffer3->append(app->game->numLevelLoads[i]);
 				largeBuffer3->append('|');
 			}
-			graphics->drawString(largeBuffer3, this->viewRect[0], this->viewRect[1], 4);
+			graphics->drawString(largeBuffer3, this->viewRect[0], this->viewRect[1], 4, false);
 			largeBuffer3->setLength(0);
 			int t = app->game->totalPlayTime + (app->upTimeMs - app->game->lastSaveTime) / 1000; //[GEC] hace que el tiempo avance
 			int n6 = t / 3600;
@@ -789,7 +790,8 @@ void Canvas::backPaint(Graphics* graphics) {
 				largeBuffer3->append(0);
 			}
 			largeBuffer3->append(n8);
-			graphics->drawString(largeBuffer3, this->viewRect[0] + this->viewRect[2] - 3, this->viewRect[1], 8);
+			graphics->drawString(largeBuffer3, this->viewRect[0] + this->viewRect[2] - 3, this->viewRect[1], 8,
+                                 false);
 			largeBuffer3->dispose();
 		}
 	}
@@ -1990,7 +1992,7 @@ void Canvas::drawCredits(Graphics* graphics) {
 		textBuff->setLength(0);
 		app->localization->composeText(0, 43, textBuff);
 		textBuff->dehyphenate();
-		graphics->drawString(textBuff, this->SCR_CX - 24, this->screenRect[3] - 32, 2);
+		graphics->drawString(textBuff, this->SCR_CX - 24, this->screenRect[3] - 32, 2, false);
 		textBuff->dispose();
 	}
 }
@@ -4700,7 +4702,7 @@ void Canvas::drawCharacterSelection(Graphics* graphics) {
 	}
 
 	textBuff->dehyphenate();
-	graphics->drawString(textBuff, this->SCR_CX, 3, 1);
+	graphics->drawString(textBuff, this->SCR_CX, 3, 1, false);
 
 	int j = 152;
 	for (int i = 0; i < ((this->stateVars[1] == 0) ? 3 : 1); i++) {
@@ -4756,7 +4758,7 @@ void Canvas::drawCharacterSelection(Graphics* graphics) {
 		textBuff->setLength(0);
 		app->localization->composeText(Strings::FILE_MENUSTRINGS, textID, textBuff);
 		textBuff->dehyphenate();
-		graphics->drawString(textBuff, j + (img->width / 2), 142, 1);
+		graphics->drawString(textBuff, j + (img->width / 2), 142, 1, false);
 
 		j += 75;
 	}
@@ -4767,7 +4769,7 @@ void Canvas::drawCharacterSelection(Graphics* graphics) {
 	textBuff->setLength(0);
 	app->localization->composeText(Strings::FILE_MENUSTRINGS, MenuStrings::CHARACTER_SELECT_CONFIRM, textBuff);
 	textBuff->wrapText(0x18, '\n');
-	graphics->drawString(textBuff, this->SCR_CX, this->screenRect[3] - 85, 1);
+	graphics->drawString(textBuff, this->SCR_CX, this->screenRect[3] - 85, 1, false);
 
 	textBuff->setLength(0);
 	app->localization->composeText(Strings::FILE_MENUSTRINGS, MenuStrings::BACK_ITEM, textBuff);
@@ -4775,7 +4777,7 @@ void Canvas::drawCharacterSelection(Graphics* graphics) {
 	graphics->fillRect(this->SCR_CX - 85, this->screenRect[3] - 60, 70, 30, button->highlighted ? 0x2896ff : 0x646464);
 	graphics->drawRect(this->SCR_CX - 85, this->screenRect[3] - 60, 70, 30);
 	button->SetTouchArea(this->SCR_CX - 85, this->screenRect[3] - 60, 70, 30);
-	graphics->drawString(textBuff, this->SCR_CX - 50, this->screenRect[3] - 50, 1);
+	graphics->drawString(textBuff, this->SCR_CX - 50, this->screenRect[3] - 50, 1,false);
 
 	int8_t b = this->OSC_CYCLE[app->time / 100 % 4];
 
@@ -4790,7 +4792,7 @@ void Canvas::drawCharacterSelection(Graphics* graphics) {
 	graphics->fillRect(this->SCR_CX + 15, this->screenRect[3] - 60, 70, 30, button->highlighted ? 0x2896ff : 0x646464);
 	graphics->drawRect(this->SCR_CX + 15, this->screenRect[3] - 60, 70, 30);
 	button->SetTouchArea(this->SCR_CX + 15, this->screenRect[3] - 60, 70, 30);
-	graphics->drawString(textBuff, this->SCR_CX + 50, this->screenRect[3] - 50, 1);
+	graphics->drawString(textBuff, this->SCR_CX + 50, this->screenRect[3] - 50, 1, false);
 
 	// [GEC]
 	if (this->stateVars[2] == 1 && this->stateVars[8] == 1) { // J2ME/BREW
@@ -4876,7 +4878,7 @@ void Canvas::drawCharacterSelectionStats(int i, Text* text, int x, int y, Graphi
 	text->dehyphenate();
 	text->append(defense);
 	this->graphics.currentCharColor = 5;
-	graphics->drawString(text, x, y + 18 + yFix, 20);
+	graphics->drawString(text, x, y + 18 + yFix, 20, false);
 	graphics->drawImage(this->imgCharacter_select_stat_bar, x - 2, y + 34, 0, 0, 0);
 
 	text->setLength(0);
@@ -4884,7 +4886,7 @@ void Canvas::drawCharacterSelectionStats(int i, Text* text, int x, int y, Graphi
 	text->dehyphenate();
 	text->append(strength);
 	this->graphics.currentCharColor = 5;
-	graphics->drawString(text, x, y + 38 + yFix, 20);
+	graphics->drawString(text, x, y + 38 + yFix, 20, false);
 	graphics->drawImage(this->imgCharacter_select_stat_bar, x - 2, y + 54, 0, 0, 0);
 
 	text->setLength(0);
@@ -4892,7 +4894,7 @@ void Canvas::drawCharacterSelectionStats(int i, Text* text, int x, int y, Graphi
 	text->dehyphenate();
 	text->append(accuracy);
 	this->graphics.currentCharColor = 5;
-	graphics->drawString(text, x, y + 58 + yFix, 20);
+	graphics->drawString(text, x, y + 58 + yFix, 20, false);
 	graphics->drawImage(this->imgCharacter_select_stat_bar, x - 2, y + 74, 0, 0, 0);
 
 	text->setLength(0);
@@ -4900,7 +4902,7 @@ void Canvas::drawCharacterSelectionStats(int i, Text* text, int x, int y, Graphi
 	text->dehyphenate();
 	text->append(agility);
 	this->graphics.currentCharColor = 5;
-	graphics->drawString(text, x, y + 78 + yFix, 20);
+	graphics->drawString(text, x, y + 78 + yFix, 20, false);
 	graphics->drawImage(this->imgCharacter_select_stat_bar, x - 2, y + 94, 0, 0, 0);
 
 	text->setLength(0);
@@ -4908,7 +4910,7 @@ void Canvas::drawCharacterSelectionStats(int i, Text* text, int x, int y, Graphi
 	text->dehyphenate();
 	text->append(iq);
 	this->graphics.currentCharColor = 5;
-	graphics->drawString(text, x, y + 98 + yFix, 20);
+	graphics->drawString(text, x, y + 98 + yFix, 20, false);
 }
 
 void Canvas::dequeueHelpDialog() {
@@ -5316,6 +5318,12 @@ void Canvas::updateLoadingBar(bool b) {
 	this->repaintFlags |= Canvas::REPAINT_LOADING_BAR;
 	return;
 }
+
+#include "SDL_log.h"
+#include <android/log.h> // Для __android_log_print
+#include <string>
+#include <codecvt>
+#include <locale>
 
 void Canvas::drawLoadingBar(Graphics* graphics) {
 	Applet* app = CAppContainer::getInstance()->app;
