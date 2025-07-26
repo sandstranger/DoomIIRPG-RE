@@ -5616,7 +5616,7 @@ void Canvas::handleCharacterSelectionInput(int key, int action) {
 
 		this->m_characterButtons->HighlightButton(0, 0, false);
 
-		if (!this->touched) {
+//		if (!this->touched) {
 			if (this->stateVars[8] == 0) { // [GEC]
 				if (action == Enums::ACTION_RIGHT) {
 					for (int i = 0; i < 3; ++i) {
@@ -5671,7 +5671,7 @@ void Canvas::handleCharacterSelectionInput(int key, int action) {
 				}
 			}
 		}
-	}
+	//}
 }
 
 void Canvas::handleStoryInput(int key, int action) {
