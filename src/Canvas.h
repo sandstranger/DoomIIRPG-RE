@@ -21,6 +21,7 @@ class Canvas
 private:
     void updateDialogLines(int dialogStyle, int dialogFlags);
     void updatePrologueLines(Text* text);
+    void updateLootLines();
 public:
 	static constexpr int KNOCKBACK_HEIGHT = 10;
 	static constexpr int FALLDOWNDEATHTIME = 750;

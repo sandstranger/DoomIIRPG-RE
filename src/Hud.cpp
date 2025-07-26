@@ -424,6 +424,9 @@ void Hud::drawCenterMessage(Graphics* graphics, Text* text, int color) {
 	if (w > app->canvas->hudRect[2]) {
 		w = app->canvas->hudRect[2];
 	}
+    if (app->localization->enableSDLTTF){
+        w = lround(w * 1.5);
+    }
 	int y = -app->canvas->screenRect[1] + 40;
 	int x = -app->canvas->screenRect[0] + (app->canvas->hudRect[2] / 2);
 

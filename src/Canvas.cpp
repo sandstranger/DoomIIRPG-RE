@@ -5341,12 +5341,6 @@ void Canvas::updateLoadingBar(bool b) {
 	return;
 }
 
-#include "SDL_log.h"
-#include <android/log.h> // Для __android_log_print
-#include <string>
-#include <codecvt>
-#include <locale>
-
 void Canvas::drawLoadingBar(Graphics* graphics) {
 	Applet* app = CAppContainer::getInstance()->app;
 	Text* text;
@@ -5837,8 +5831,15 @@ void Canvas::drawLootingMenu(Graphics* graphics) {
 		smallBuffer->dehyphenate();
 		graphics->drawString(smallBuffer, this->SCR_CX, dialogRect[1] - 16, 1);
 		smallBuffer->dispose();
+        if (!this->lootText->isTranslated) {
+            this->lootText->translateText();
+            if (this->lootText->isTranslated) {
+                updateLootLines();
+            }
+        }
 		for (int i = 0; i < 3; ++i) {
-			graphics->drawString(this->lootText, dialogRect[0] + 5, dialogRect[1] + 1 + i * 16, 20, this->lootPoolIndices[2 * (i + this->lootLineNum)], this->lootPoolIndices[2 * (i + this->lootLineNum) + 1]);
+			graphics->drawString(this->lootText, dialogRect[0] + 5, dialogRect[1] + 1 + i * 16, 20, this->lootPoolIndices[2 * (i + this->lootLineNum)], this->lootPoolIndices[2 * (i + this->lootLineNum) + 1],
+                                 false);
 		}
 		int n = this->numPoolItems + ((this->lootPoolCredits != 0) ? 1 : 0);
 		this->drawScrollBar(graphics, dialogRect[0] + dialogRect[2], dialogRect[1] + 1, dialogRect[3] - 1, this->lootLineNum, (this->lootLineNum + 3 > n) ? n : (this->lootLineNum + 3), n, 3);
@@ -5953,22 +5954,26 @@ void Canvas::poolLoot(int* array) {
 		app->localization->composeText((short)0, (short)228, this->lootText);
 	}
 	this->lootText->dehyphenate();
-	for (int n13 = 0; n13 < 18; ++n13) {
-		this->lootPoolIndices[n13] = (short)0;
-	}
-	int length = this->lootText->length();
-	int n11 = 0;
-	int n12 = 0;
-	for (int n13 = 0; n13 < length; ++n13) {
-		if (this->lootText->charAt(n13) == '|') {
-			this->lootPoolIndices[n12 * 2] = (short)n11;
-			this->lootPoolIndices[n12 * 2 + 1] = (short)(n13 - n11);
-			++n12;
-			n11 = n13 + 1;
-		}
-	}
-	this->lootPoolIndices[n12 * 2] = (short)n11;
-	this->lootPoolIndices[n12 * 2 + 1] = (short)(length - n11);
+    updateLootLines();
+}
+
+void Canvas::updateLootLines() {
+    for (int n13 = 0; n13 < 18; ++n13) {
+        this->lootPoolIndices[n13] = (short)0;
+    }
+    int length = this->lootText->length();
+    int n11 = 0;
+    int n12 = 0;
+    for (int n13 = 0; n13 < length; ++n13) {
+        if (this->lootText->charAt(n13) == '|') {
+            this->lootPoolIndices[n12 * 2] = (short)n11;
+            this->lootPoolIndices[n12 * 2 + 1] = (short)(n13 - n11);
+            ++n12;
+            n11 = n13 + 1;
+        }
+    }
+    this->lootPoolIndices[n12 * 2] = (short)n11;
+    this->lootPoolIndices[n12 * 2 + 1] = (short)(length - n11);
 }
 
 void Canvas::giveLootPool() {
