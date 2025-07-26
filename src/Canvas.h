@@ -19,7 +19,7 @@ class fmSwipeArea;
 class Canvas
 {
 private:
-    void updateDialogLines();
+    void updateDialogLines(int dialogStyle, int dialogFlags);
     void updatePrologueLines(Text* text);
 public:
 	static constexpr int KNOCKBACK_HEIGHT = 10;

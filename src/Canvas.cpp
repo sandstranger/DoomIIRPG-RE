@@ -672,7 +672,7 @@ void Canvas::backPaint(Graphics* graphics) {
 				largeBuffer2->append("cnt: ");
 				largeBuffer2->append(app->tinyGL->spanCalls)->append('/');
 				largeBuffer2->append(app->tinyGL->spanPixels);
-				graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0);
+				graphics->drawString(largeBuffer2, this->viewRect[0], n3, 0, false);
 				n3 += Applet::FONT_HEIGHT[app->fontType];
 				largeBuffer2->setLength(0);
 				largeBuffer2->append("tris: ");
@@ -3352,7 +3352,7 @@ void Canvas::dialogState(Graphics* graphics) {
         dialogBuffer->translateText();
 
         if (dialogBuffer->isTranslated) {
-            updateDialogLines();
+            updateDialogLines(dialogStyle, dialogFlags);
         }
     }
 
@@ -4341,7 +4341,7 @@ void Canvas::closeDialog(bool skipDialog) {
 	this->repaintFlags |= Canvas::REPAINT_VIEW3D;
 }
 
-void Canvas::updateDialogLines() {
+void Canvas::updateDialogLines(int dialogStyle, int dialogFlags) {
     int i = 0;
     int n = 0;
     int length2 = this->dialogBuffer->length();
@@ -4455,7 +4455,7 @@ void Canvas::prepareDialog(Text* text, int dialogStyle, int dialogFlags) {
 			this->dialogBuffer->wrapText(this->dialogWithBarMaxChars);
 		}
 	}
-	updateDialogLines();
+	updateDialogLines(dialogStyle, dialogFlags);
 	smallBuffer->dispose();
 
 	if (dialogStyle == 2) {
