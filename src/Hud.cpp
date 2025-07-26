@@ -1006,6 +1006,7 @@ void Hud::drawBubbleText(Graphics* graphics) {
 			n += 20;
 		}
 	}
+    bubbleText->translateText();
 	int n5 = this->bubbleText->length() * 9 + 6;
 	int n6 = 20;
 	int n7 = n2 - std::max(0, n5 + 2 - (app->canvas->viewRect[2] - n2));
@@ -1022,7 +1023,7 @@ void Hud::drawBubbleText(Graphics* graphics) {
 	graphics->drawLine(n7, n, n7, n + n6);
 	graphics->drawLine(n7 + n5, n, n7 + n5, n + n6);
 	graphics->drawLine(n7, n + n6, n7 + n5, n + n6);
-	graphics->drawString(this->bubbleText, n7 + 2, n + 3, 4);
+	graphics->drawString(this->bubbleText, n7 + 2, n + 3, 4, false);
 	graphics->drawRegion(app->canvas->imgUIImages, n3, n4, 10, 6, n7 + 5, n + n6, 0, 0, 0);
 }
 
