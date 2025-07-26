@@ -388,10 +388,14 @@ void Hud::drawTopBar(Graphics* graphics) {
 				n += 20;
 			}
 			int length = smallBuffer->length();
-			if (n + 12 * (length + 1) > app->canvas->hudRect[2] && !app->localization->enableSDLTTF) {
+			if (n + 12 * (length + 1) > app->canvas->hudRect[2]) {
 				length = (app->canvas->hudRect[2] - n) / 9 - 1;
 			}
-			graphics->drawString(smallBuffer, n - app->canvas->screenRect[0], 3, 0, n3, length);
+            if (!app->localization->enableSDLTTF) {
+                graphics->drawString(smallBuffer, n - app->canvas->screenRect[0], 3, 0, n3, length);
+            } else{
+                graphics->drawString(smallBuffer, n - app->canvas->screenRect[0], 3, 0, n3, -1);
+            }
 		}
 	}
 	smallBuffer->dispose();
