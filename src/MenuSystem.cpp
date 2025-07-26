@@ -1041,10 +1041,11 @@ LABEL_61:
 						}
 						
 						if (action) {
-							graphics->drawString(textBuffer2, v45, v80 + (this->menuItem_height >> 1), 10);
+							graphics->drawString(textBuffer2, v45, v80 + (this->menuItem_height >> 1), 10,
+                                                 false);
 						}
 						else {
-							graphics->drawString(textBuffer2, v45, v80, 24);
+							graphics->drawString(textBuffer2, v45, v80, 24, false);
 						}
 						
 					}
