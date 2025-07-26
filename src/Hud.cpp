@@ -437,17 +437,26 @@ void Hud::drawCenterMessage(Graphics* graphics, Text* text, int color) {
 	int i = 0;
 	Text* textBuff = app->localization->getSmallBuffer();
 	int first;
+    bool enableSdlTTfRendering = app->localization->enableSDLTTF;
 	while ((first = text->findFirstOf('|', i)) >= 0) {
 		textBuff->setLength(0);
 		text->substring(textBuff, i, first);
-		graphics->drawString(textBuff, x, y, 17, 0, first - i);
+        if (enableSdlTTfRendering) {
+            graphics->drawString(textBuff, x, y, 17);
+        } else{
+            graphics->drawString(textBuff, x, y, 17, 0, first - i);
+        }
 		y += 16;
 		i = first + 1;
 	}
 
 	textBuff->setLength(0);
 	text->substring(textBuff, i);
-	graphics->drawString(textBuff, x, y, 17, 0, text->length() - i);
+    if (enableSdlTTfRendering){
+    	graphics->drawString(textBuff, x, y, 17);
+    } else{
+        graphics->drawString(textBuff, x, y, 17, 0, text->length() - i);
+    }
 	textBuff->dispose();
 }
 
@@ -485,13 +494,14 @@ void Hud::drawCinematicText(Graphics* graphics) {
 			scr_CX = width + 10;
 		}
 
+        largeBuffer->translateText();
 		int first = largeBuffer->findFirstOf('\n', 0);
 		if (first == -1) {
-			graphics->drawString(largeBuffer, scr_CX, n4, flags);
+			graphics->drawString(largeBuffer, scr_CX, n4, flags, false);
 		}
 		else {
-			graphics->drawString(largeBuffer, scr_CX, n4, flags, 0, first);
-			graphics->drawString(largeBuffer, scr_CX, n4 + 16, flags, first + 1, 9999);
+			graphics->drawString(largeBuffer, scr_CX, n4, flags, 0, first, false);
+			graphics->drawString(largeBuffer, scr_CX, n4 + 16, flags, first + 1, 9999, false);
 		}
 	}
 	largeBuffer->dispose();

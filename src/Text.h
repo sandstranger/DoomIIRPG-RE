@@ -86,10 +86,10 @@ public:
 class Text
 {
 private:
-    bool isTranslated;
     bool containsValidChars();
 public:
-	wchar_t *chars;
+    bool isTranslated;
+    wchar_t *chars;
     wchar_t *translatedChars;
     int _translatedLength;
 	int _length;

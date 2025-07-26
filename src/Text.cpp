@@ -810,12 +810,14 @@ int Text::findLastOf(char c, int n) {
 }
 
 void Text::substring(Text* t, int i) {
+    t->isTranslated = false;
 	for (int j = i; j < this->_length; j++) {
 		t->chars[t->_length++] = this->chars[j];
 	}
 }
 
 void Text::substring(Text* t, int i, int i2) {
+    t->isTranslated = false;
 	for (int j = i; j < (i + i2); j++) {
 		t->chars[t->_length++] = this->chars[j];
 	}

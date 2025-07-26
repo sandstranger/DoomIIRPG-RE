@@ -1816,6 +1816,25 @@ void Canvas::loadMap(int loadMapID, bool b, bool tm_NewGame) {
 	}
 }
 
+void Canvas::updatePrologueLines(Text* text) {
+    int n3 = (this->displayRect[3] - 40) / 21;
+    this->storyTotalPages = 0;
+
+    int n4 = 0;
+    int first = 0;
+    while ((first = text->findFirstOf('|', first)) != -1) {
+        ++first;
+        if (++n4 % n3 == 0) {
+            this->storyIndexes[this->storyTotalPages++] = first;
+        }
+    }
+
+    this->dialogBuffer = text;
+    this->storyIndexes[this->storyTotalPages] = text->length();
+    this->storyX = this->displayRect[0] + 15;
+    this->storyY = this->displayRect[1] + 20;
+}
+
 void Canvas::loadPrologueText() {
 	Applet* app = CAppContainer::getInstance()->app;
 	Text* text;
@@ -1847,24 +1866,8 @@ void Canvas::loadPrologueText() {
 	app->localization->unloadText(2);
 
 	int n2 = (this->displayRect[2] - 30) / 10;
-	int n3 = (this->displayRect[3] - 40) / 21;
 	text->wrapText(n2);
-
-	this->storyIndexes[this->storyTotalPages++] = 0;
-
-	int n4 = 0;
-	int first = 0;
-	while ((first = text->findFirstOf('|', first)) != -1) {
-		++first;
-		if (++n4 % n3 == 0) {
-			this->storyIndexes[this->storyTotalPages++] = first;
-		}
-	}
-
-	this->dialogBuffer = text;
-	this->storyIndexes[this->storyTotalPages] = text->length();
-	this->storyX = this->displayRect[0] + 15;
-	this->storyY = this->displayRect[1] + 20;
+    updatePrologueLines(text);
 }
 
 void Canvas::loadEpilogueText() {
@@ -3345,6 +3348,14 @@ void Canvas::dialogState(Graphics* graphics) {
 		this->m_dialogButtons->GetButton(4)->drawButton = false;
 	}
 
+    if (!dialogBuffer->isTranslated) {
+        dialogBuffer->translateText();
+
+        if (dialogBuffer->isTranslated) {
+            updateDialogLines();
+        }
+    }
+
 	int currentDialogLine = 0;
 	if (this->dialogStyle == 2 || this->dialogStyle == 16 || this->dialogStyle == 9) {
 		currentDialogLine = 1;
@@ -3368,7 +3379,7 @@ void Canvas::dialogState(Graphics* graphics) {
 		if (this->dialogStyle == 9) {
 			this->graphics.currentCharColor = 2;
 		}
-		graphics->drawString(this->dialogBuffer, this->SCR_CX, dialogRect[1] - 16, 1, this->dialogIndexes[0], this->dialogIndexes[1]);
+		graphics->drawString(this->dialogBuffer, this->SCR_CX, dialogRect[1] - 16, 1, this->dialogIndexes[0], this->dialogIndexes[1],false);
 	}
 	else if (this->dialogStyle == 4) {
 		graphics->setColor(n2);
@@ -3381,7 +3392,7 @@ void Canvas::dialogState(Graphics* graphics) {
 			graphics->fillRect(dialogRect[0], dialogRect[1] - 12, dialogRect[2], 12);
 			graphics->setColor(color);
 			graphics->drawRect(dialogRect[0], dialogRect[1] - 12, dialogRect[2] - 1, 12);
-			graphics->drawString(this->dialogBuffer, dialogRect[0] + (dialogRect[2] + 10 - 2 >> 1), dialogRect[1] - 5, 3, this->dialogIndexes[0], this->dialogIndexes[1]);
+			graphics->drawString(this->dialogBuffer, dialogRect[0] + (dialogRect[2] + 10 - 2 >> 1), dialogRect[1] - 5, 3, this->dialogIndexes[0], this->dialogIndexes[1],false);
 			this->m_dialogButtons->GetButton(8)->drawButton = true;
 			fmButton* Button = this->m_dialogButtons->GetButton(8);
 			Button->SetTouchArea(*dialogRect, dialogRect[1] - 12, dialogRect[2], dialogRect[3] + 12);
@@ -3468,7 +3479,7 @@ void Canvas::dialogState(Graphics* graphics) {
 		if (this->dialogStyle == 9) {
 			this->graphics.currentCharColor = 2;
 		}
-		graphics->drawString(this->dialogBuffer, n, n11, 0, n13, n15);
+		graphics->drawString(this->dialogBuffer, n, n11, 0, n13, n15,false);
 		n11 += 16;
 	}
 	int8_t b = this->OSC_CYCLE[app->time / 200 % 4];
@@ -4330,10 +4341,34 @@ void Canvas::closeDialog(bool skipDialog) {
 	this->repaintFlags |= Canvas::REPAINT_VIEW3D;
 }
 
+void Canvas::updateDialogLines() {
+    int i = 0;
+    int n = 0;
+    int length2 = this->dialogBuffer->length();
+    this->numDialogLines = 0;
+    while (i < length2) {
+        if (this->dialogBuffer->charAt(i) == '|') {
+            this->dialogIndexes[this->numDialogLines * 2] = (short)n;
+            this->dialogIndexes[this->numDialogLines * 2 + 1] = (short)(i - n);
+            this->numDialogLines++;
+            n = i + 1;
+        }
+        ++i;
+    }
+    this->dialogIndexes[this->numDialogLines * 2] = (short)n;
+    this->dialogIndexes[this->numDialogLines * 2 + 1] = (short)(length2 - n);
+    this->numDialogLines++;
+    this->currentDialogLine = 0;
+    this->dialogLineStartTime = CAppContainer::getInstance()->app->time;
+    this->dialogTypeLineIdx = 0;
+    this->dialogStartTime = CAppContainer::getInstance()->app->time;
+    this->dialogItem = nullptr;
+    this->dialogFlags = dialogFlags;
+    this->dialogStyle = dialogStyle;
+}
+
 void Canvas::prepareDialog(Text* text, int dialogStyle, int dialogFlags) {
 	Applet* app = CAppContainer::getInstance()->app;
-	int i = 0;
-	int n = 0;
 	Text* smallBuffer = app->localization->getSmallBuffer();
 	if (dialogStyle == 3) {
 		this->dialogViewLines = 4;
@@ -4420,27 +4455,7 @@ void Canvas::prepareDialog(Text* text, int dialogStyle, int dialogFlags) {
 			this->dialogBuffer->wrapText(this->dialogWithBarMaxChars);
 		}
 	}
-	int length2 = this->dialogBuffer->length();
-	this->numDialogLines = 0;
-	while (i < length2) {
-		if (this->dialogBuffer->charAt(i) == '|') {
-			this->dialogIndexes[this->numDialogLines * 2] = (short)n;
-			this->dialogIndexes[this->numDialogLines * 2 + 1] = (short)(i - n);
-			this->numDialogLines++;
-			n = i + 1;
-		}
-		++i;
-	}
-	this->dialogIndexes[this->numDialogLines * 2] = (short)n;
-	this->dialogIndexes[this->numDialogLines * 2 + 1] = (short)(length2 - n);
-	this->numDialogLines++;
-	this->currentDialogLine = 0;
-	this->dialogLineStartTime = app->time;
-	this->dialogTypeLineIdx = 0;
-	this->dialogStartTime = app->time;
-	this->dialogItem = nullptr;
-	this->dialogFlags = dialogFlags;
-	this->dialogStyle = dialogStyle;
+	updateDialogLines();
 	smallBuffer->dispose();
 
 	if (dialogStyle == 2) {
@@ -4651,8 +4666,15 @@ void Canvas::drawStory(Graphics* graphics)
 		this_00->dispose();
 		this_01->dispose();
 
+        if (!this->dialogBuffer->isTranslated) {
+            dialogBuffer->translateText();
+            if (dialogBuffer->isTranslated) {
+                updatePrologueLines(dialogBuffer);
+            }
+        }
+
 		graphics->drawString(this->dialogBuffer, this->storyX, this->storyY, 21, 0, this->storyIndexes[0],
-			this->storyIndexes[1] - this->storyIndexes[0]);
+			this->storyIndexes[1] - this->storyIndexes[0],false);
 	}
 }
 
