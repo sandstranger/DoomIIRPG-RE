@@ -962,11 +962,11 @@ int Text::insertLineBreak(int i, int i2, char c) {
 }
 
 int Text::getStringWidth() {
-	return this->getStringWidth(0, this->_length, true);
+	return this->getStringWidth(0, this->length(), true);
 }
 
 int Text::getStringWidth(bool b) {
-	return this->getStringWidth(0, this->_length, b);
+	return this->getStringWidth(0, this->length(), b);
 }
 
 int Text::getStringWidth(int i, int i2, bool b) {
@@ -1010,8 +1010,8 @@ int Text::getStringWidth(int i, int i2, bool b) {
 
 int Text::getNumLines() {
 	int numLines = 1;
-	for (int i = 0; i < this->_length; ++i) {
-		char c = this->chars[i];
+	for (int i = 0; i < this->length(); ++i) {
+		char c = this->charAt(i);
 		if (c == '\n' || c == '|') {
 			++numLines;
 		}

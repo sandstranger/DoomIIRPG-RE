@@ -1978,11 +1978,18 @@ void Canvas::initScrollingText(short i, short i2, bool dehyphenate, int spacingH
 	this->dialogBuffer->wrapText((this->displayRect[2] - 8) / Applet::CHAR_SPACING[app->fontType]);
 	this->scrollingTextSpacing = spacingHeight;
 	this->scrollingTextStart = -1;
+    this->numLines = numLines;
 	this->scrollingTextLines = (this->dialogBuffer->getNumLines() + numLines);
 	this->scrollingTextMSLine = textMSLine;
 	this->scrollingTextDone = false;
 	this->scrollingTextFontHeight = Applet::FONT_HEIGHT[app->fontType] + 2;
 	this->scrollingTextSpacingHeight = spacingHeight * ((316 - (Applet::FONT_HEIGHT[app->fontType] * 2)) / spacingHeight);
+}
+
+void Canvas::updateScrolling() {
+    this->scrollingTextStart = -1;
+    this->scrollingTextLines = (this->dialogBuffer->getNumLines() + numLines);
+    this->scrollingTextDone = false;
 }
 
 void Canvas::drawCredits(Graphics* graphics) {
@@ -4669,7 +4676,10 @@ void Canvas::drawStory(Graphics* graphics)
         if (!this->dialogBuffer->isTranslated) {
             dialogBuffer->translateText();
             if (dialogBuffer->isTranslated) {
-                updatePrologueLines(dialogBuffer);
+                updateScrolling();
+                if (this->state== Canvas::ST_INTRO) {
+                    updatePrologueLines(dialogBuffer);
+                }
             }
         }
 
