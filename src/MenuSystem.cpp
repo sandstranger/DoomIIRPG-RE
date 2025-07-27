@@ -757,8 +757,7 @@ void MenuSystem::paint(Graphics* graphics) {
 				textBuffer2->insert(' ', 0);
 			}
 			textBuffer1->append(textBuffer2);
-            textBuffer1->translateText();
-			graphics->drawString(textBuffer1, app->canvas->SCR_CX, yPos + 3, 3, false);
+			graphics->drawString(textBuffer1, app->canvas->SCR_CX, yPos + 3, 3);
 			graphics->drawImage(this->imgGameMenuHealth, ((Applet::IOS_WIDTH - textBuffer1->getStringWidth()) >> 1) - 5, yPos + 3, 10, 0, 0);
 			graphics->drawImage(this->imgGameMenuShield, ((textBuffer1->getStringWidth() + Applet::IOS_WIDTH) >> 1) + 5, yPos + 3, 6, 0, 0);
 		}
@@ -946,7 +945,6 @@ LABEL_61:
 				}
 				if (action)
 				{
-                    textBuffer1->translateText();
 					v37 = textBuffer1->getStringWidth();
 					menuItem_width = this->menuItem_width;
 					if (v37 + 10 > menuItem_width)
@@ -963,7 +961,6 @@ LABEL_61:
 				}
 				if ((flags & 8) != 0)
 				{
-                    textBuffer1->translateText();
 					v40 = textBuffer1->getStringWidth(false);
 					v42 = v40 >> 1;
 					if (action)
