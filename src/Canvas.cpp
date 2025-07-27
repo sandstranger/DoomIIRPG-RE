@@ -7697,8 +7697,10 @@ void Canvas::drawMiniGameHelpText(Graphics* graphics, int i, int i2) {
 
 	textBuff1->setLength(0);
 	app->localization->composeText(i2, textBuff1);
-	textBuff1->wrapText(0x31, '\n');
-	iVar1 = textBuff1->getNumLines();
+    textBuff1->wrapText(0x31, '\n');
+    textBuff1->translateText();
+    textBuff1->wrapText(0x31, '\n');
+    iVar1 = textBuff1->getNumLines();
 	this->helpTextNumberOfLines = iVar1;
 
 	textBuff2 = app->localization->getSmallBuffer();
@@ -7729,7 +7731,7 @@ void Canvas::drawMiniGameHelpText(Graphics* graphics, int i, int i2) {
 	}
 	textBuff2->dispose();
 
-	graphics->drawString(textBuff1, this->screenRect[0] + 0x12, this->screenRect[1] + 0x2d, 0x14);
+	graphics->drawString(textBuff1, this->screenRect[0] + 0x12, this->screenRect[1] + 0x2d, 0x14, false);
 	iVar3 = this->helpTextNumberOfLines;
 	iVar1 = this->miniGameHelpScrollPosition + 0x10;
 	if (iVar3 < iVar1) {

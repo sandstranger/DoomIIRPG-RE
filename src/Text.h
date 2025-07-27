@@ -90,8 +90,6 @@ private:
 public:
     bool isTranslated;
     wchar_t *chars;
-    wchar_t *translatedChars;
-    int _translatedLength;
 	int _length;
 	int stringWidth;
 

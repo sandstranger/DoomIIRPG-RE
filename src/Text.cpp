@@ -533,11 +533,8 @@ Text::Text(int countChars) {
 
 	this->chars = new wchar_t [countChars];
 	std::wmemset(this->chars, 0, countChars);
-    this->translatedChars = new wchar_t [countChars];
-    std::wmemset(this->translatedChars, 0, countChars);
     this->_length = 0;
-    this->_translatedLength = 0;
-	this->chars[0] = this->translatedChars[0] = '\0';
+	this->chars[0]  = '\0';
 	this->stringWidth = -1;
 }
 
@@ -620,8 +617,15 @@ void Text::translateText() {
     isTranslated = strcmp(charsArray, translatedCharsArray) != 0;
 
     if (isTranslated){
-        translatedChars = char_to_wchar(translatedCharsArray);
-        _translatedLength = wcslen(translatedChars);
+        auto wchars = char_to_wchar(translatedCharsArray);
+        _length = wcslen(wchars);
+
+        for (int i = 0; i < _length; ++i) {
+            chars[i] = wchars[i];
+        }
+
+        chars[_length] = L'\0';
+        free(wchars);
     }
 }
 
@@ -632,7 +636,7 @@ bool Text::startup() {
 }
 
 int Text::length() {
-	return isTranslated ? _translatedLength : this->_length;
+	return this->_length;
 }
 
 void Text::setLength(int i) {
@@ -640,21 +644,19 @@ void Text::setLength(int i) {
 		i = 0;
 	}
 	this->_length = i;
-	this->chars[i] = this->translatedChars[0] = '\0';
+	this->chars[i] = '\0';
     isTranslated = false;
-    this->_translatedLength = 0;
 }
 
 Text* Text::deleteAt(int i, int i2) {
     std::wmemcpy(this->chars + i,this->chars + i + i2,this->_length - (i + i2));
 	this->_length -= i2;
-    isTranslated = false;
     this->chars[this->_length] = '\0';
 	return this;
 }
 
 wchar_t Text::charAt(int i) {
-	return isTranslated ? translatedChars[i] : this->chars[i];
+	return this->chars[i];
 }
 
 void Text::setCharAt(char c, int i) {
@@ -664,14 +666,12 @@ void Text::setCharAt(char c, int i) {
 Text* Text::append(char c) {
 	this->chars[this->_length++] = c;
 	this->chars[this->_length] = '\0';
-    isTranslated = false;
     return this;
 }
 
 Text* Text::append(uint8_t c) {
 	this->chars[this->_length++] = (char)c;
 	this->chars[this->_length] = '\0';
-    isTranslated = false;
     return this;
 }
 
@@ -682,22 +682,18 @@ Text* Text::append(const char* c) {
 		this->chars[this->_length++] = c[i];
 	}
 	this->chars[this->_length] = '\0';
-    isTranslated = false;
     return this;
 }
 
 Text* Text::append(int i) {
-    isTranslated = false;
     return this->insert(i, this->_length);
 }
 
 Text* Text::append(Text* t) {
-    isTranslated = false;
     return this->append(t, 0, t->_length);
 }
 
 Text* Text::append(Text* t, int i) {
-    isTranslated = false;
     return this->append(t, i, t->_length - i);
 }
 
@@ -706,7 +702,6 @@ Text* Text::append(Text* t, int i, int i2) {
 		std::wmemcpy(this->chars + this->_length, t->chars + i, i2);
 		this->_length += i2;
 		this->chars[this->_length] = '\0';
-        isTranslated = false;
     }
 	return this;
 }
@@ -728,7 +723,6 @@ Text* Text::insert(uint8_t c, int i) {
 }
 
 Text* Text::insert(int i, int i2) {
-    isTranslated = false;
     if (i < 0) {
 		this->insert('-', i2);
 		++i2;
@@ -742,13 +736,11 @@ Text* Text::insert(int i, int i2) {
 }
 
 Text* Text::insert(char* c, int i) {
-    isTranslated = false;
     return this->insert(c, 0, std::strlen(c), i);
 }
 
 Text* Text::insert(char* c, int i, int i2, int i3) {
 	std::wmemcpy(this->chars + i3 + i2, this->chars + i3, this->_length - i3);
-    isTranslated = false;
 	this->_length += i2;
 	while (--i2 >= 0) {
 		this->chars[i3++] = c[i++];
@@ -769,8 +761,8 @@ int Text::findFirstOf(char c) {
 }
 
 int Text::findFirstOf(char c, int i) {
-	while (i < this->_length) {
-		if (this->chars[i] == c) {
+	while (i < this->length()) {
+		if (this->charAt(i) == c) {
 			return i;
 		}
 		++i;
@@ -779,9 +771,9 @@ int Text::findFirstOf(char c, int i) {
 }
 
 int Text::findAnyFirstOf(char* c, int i) {
-	while (i < this->_length) {
+	while (i < this->length()) {
 		for (int j = 0; c[j] != '\0'; ++j) {
-			if (this->chars[i] == c[j]) {
+			if (this->charAt(i) == c[j]) {
 				return i;
 			}
 		}
@@ -791,9 +783,9 @@ int Text::findAnyFirstOf(char* c, int i) {
 }
 
 int Text::findLastOf(char c) {
-	int i = this->_length;
+	int i = this->length();
 	while (--i >= 0) {
-		if (this->chars[i] == c) {
+		if (this->charAt(i) == c) {
 			return i;
 		}
 	}
@@ -802,7 +794,7 @@ int Text::findLastOf(char c) {
 
 int Text::findLastOf(char c, int n) {
 	while (--n >= 0) {
-		if (this->chars[n] == c) {
+		if (this->charAt(n) == c) {
 			return n;
 		}
 	}
@@ -810,21 +802,19 @@ int Text::findLastOf(char c, int n) {
 }
 
 void Text::substring(Text* t, int i) {
-    t->isTranslated = false;
-	for (int j = i; j < this->_length; j++) {
-		t->chars[t->_length++] = this->chars[j];
+	for (int j = i; j < this->length(); j++) {
+		t->chars[t->_length++] = this->charAt(j);
 	}
 }
 
 void Text::substring(Text* t, int i, int i2) {
-    t->isTranslated = false;
 	for (int j = i; j < (i + i2); j++) {
-		t->chars[t->_length++] = this->chars[j];
+		t->chars[t->_length++] = this->charAt(j);
 	}
 }
 
 void Text::dehyphenate() {
-	this->dehyphenate(0, this->_length);
+	this->dehyphenate(0, this->length());
 }
 
 void Text::dehyphenate(int i, int i2) {
@@ -866,7 +856,6 @@ int Text::wrapText(int i, int i2, char c) {
 }
 
 int Text::wrapText(int i, int i2, int i3, char c) {
-    isTranslated = false;
     char wordBreaks[5];
 	char n8;
     wchar_t * chars;
@@ -875,7 +864,7 @@ int Text::wrapText(int i, int i2, int i3, char c) {
 
 	std::memcpy(wordBreaks, "|\n- ", 5);
 
-	length = this->_length;
+	length = this->length();
 	chars = this->chars;
 	n4 = 0;
 	n5 = 0;
@@ -905,7 +894,7 @@ int Text::wrapText(int i, int i2, int i3, char c) {
 			n8 = 0;
 			n9 = false;
 			if (i3 > 0 && n6 == i3) {
-				this->_length = n7;
+                this->_length = n7;
 				return n4;
 			}
 		}
@@ -920,7 +909,7 @@ int Text::wrapText(int i, int i2, int i3, char c) {
 			}
 		}
 	}
-	n10 = n5 + (this->_length - i);
+	n10 = n5 + (this->length() - i);
 	if (n9 == false && n8 == '-') {
 		--n10;
 	}
@@ -933,8 +922,8 @@ int Text::wrapText(int i, int i2, int i3, char c) {
 		i = n7 + 1;
 		++n6;
 		if (i3 > 0 && n6 == i3) {
-			this->_length = n7;
-			return n11;
+            this->_length = n7;
+            return n11;
 		}
 	}
 	this->stringWidth = this->_length - n7;
@@ -943,22 +932,21 @@ int Text::wrapText(int i, int i2, int i3, char c) {
 }
 
 int Text::insertLineBreak(int i, int i2, char c) {
-    isTranslated = false;
-    if (this->chars[i2] == '-') {
+    if (this->charAt(i2) == '-') {
 		++i2;
-		if (this->chars[i2] == '-') {
-			this->chars[i2] = c;
-		}
+		if (this->charAt(i2) == '-') {
+            this->chars[i2] = c;
+        }
 		else {
 			this->insert(c, i2);
 		}
 	}
 	else {
-		this->chars[i2] = c;
-	}
-	int oldlen = this->_length;
+        this->chars[i2] = c;
+    }
+	int oldlen = this->length();
 	this->dehyphenate(i, i2 - i - 1);
-	return (i2 - (oldlen - this->_length)) + 1;
+	return (i2 - (oldlen - this->length())) + 1;
 }
 
 int Text::getStringWidth() {

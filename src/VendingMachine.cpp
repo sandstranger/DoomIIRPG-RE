@@ -462,11 +462,13 @@ void VendingMachine::drawGameResults(Graphics* graphics) {
 #endif
 
     smallBuffer->wrapText(20, '\n');
+    smallBuffer->translateText();
+    smallBuffer->wrapText(20, '\n');
     int stringWidth = smallBuffer->getStringWidth();
     int n = smallBuffer->getNumLines() * 16;
     graphics->fillRect(app->canvas->SCR_CX - (stringWidth / 2) - 6, app->canvas->SCR_CY - (n / 2) - 4, stringWidth + 12, n + 8, 0xFF000000);
     graphics->drawRect(app->canvas->SCR_CX - (stringWidth / 2) - 6, app->canvas->SCR_CY - (n / 2) - 4, stringWidth + 12, n + 8, 0xFFFFFFFF);
-    graphics->drawString(smallBuffer, app->canvas->SCR_CX, app->canvas->SCR_CY, 3);
+    graphics->drawString(smallBuffer, app->canvas->SCR_CX, app->canvas->SCR_CY, 3, false);
     smallBuffer->dispose();
 }
 
@@ -504,7 +506,9 @@ void VendingMachine::drawMainScreen(Graphics* graphics) {
         app->localization->composeText((short)0, (short)199, smallBuffer);
     }
     smallBuffer->wrapText(26, '\n');
-    graphics->drawString(smallBuffer, 240, n3, 17);
+    smallBuffer->translateText();
+    smallBuffer->wrapText(26, '\n');
+    graphics->drawString(smallBuffer, 240, n3, 17, false);
 
     short n4;
     short n5;
