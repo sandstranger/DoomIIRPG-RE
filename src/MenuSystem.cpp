@@ -1170,7 +1170,7 @@ LABEL_61:
 			v64,
 			v61 + (imgGameMenuTornPage->width >> 1),
 			v82 + (this->imgGameMenuTornPage->height >> 1),
-			3);
+			3, false);
 		v64->dispose();
 	}
 
