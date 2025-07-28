@@ -482,8 +482,12 @@ void Hud::drawCinematicText(Graphics* graphics) {
 		largeBuffer->setLength(0);
 		app->localization->composeText(app->hud->cinTitleID, largeBuffer);
 		largeBuffer->wrapText(n2, 1, '\n');
-        largeBuffer->translateText();
-		largeBuffer->wrapText(n2, 1, '\n');
+        if (!largeBuffer->isTranslated) {
+            largeBuffer->translateText();
+            if (largeBuffer->isTranslated){
+                largeBuffer->wrapText(n2, 1, '\n');
+            }
+        }
 		graphics->drawString(largeBuffer, scr_CX, 1, 1, false);
 	}
 
@@ -492,9 +496,13 @@ void Hud::drawCinematicText(Graphics* graphics) {
 		int n4 = (n3 + (canvas->screenRect[3] - n3 - 32 >> 1)) - 10;
 		largeBuffer->setLength(0);
 		app->localization->composeText(app->hud->subTitleID, largeBuffer);
-		largeBuffer->wrapText(n2, 2, '\n');
-        largeBuffer->translateText();
-		largeBuffer->wrapText(n2, 2, '\n');
+        largeBuffer->wrapText(n2, 2, '\n');
+        if (!largeBuffer->isTranslated) {
+            largeBuffer->translateText();
+            if (largeBuffer->isTranslated){
+                largeBuffer->wrapText(n2, 2, '\n');
+            }
+        }
 		if (app->hud->showCinPlayer) {
 			graphics->drawRegion(app->hud->imgPlayerFaces, 0, 0, 32, 30, 5, n4 - (width - 32) / 2, 0, 0, 0);
 			flags = 4;

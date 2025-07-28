@@ -365,8 +365,12 @@ void SentryBotGame::drawFailureScreen(Graphics* graphics) {
     smallBuffer->setLength(0);
     app->localization->composeText((short)0, n3, smallBuffer);
     smallBuffer->wrapText(22, '\n');
-    smallBuffer->translateText();
-    smallBuffer->wrapText(22, '\n');
+    if (!smallBuffer->isTranslated) {
+        smallBuffer->translateText();
+        if (smallBuffer->isTranslated) {
+            smallBuffer->wrapText(22, '\n');
+        }
+    }
     graphics->drawString(smallBuffer, n, n4 + 80, 3, false);
     smallBuffer->dispose();
 }
@@ -395,8 +399,12 @@ void SentryBotGame::drawSuccessScreen(Graphics* graphics) {
         smallBuffer->setLength(0);
         app->localization->composeText((short)0, (short)188, smallBuffer);
         smallBuffer->wrapText(22, '\n');
-        smallBuffer->translateText();
-        smallBuffer->wrapText(22, '\n');
+        if (!smallBuffer->isTranslated){
+            smallBuffer->translateText();
+            if (smallBuffer->isTranslated) {
+                smallBuffer->wrapText(22, '\n');
+            }
+        }
         graphics->drawString(smallBuffer, n, n2 + 80, 3, false);
 
         if (SentryBotGame::wasTouched) {
@@ -461,8 +469,12 @@ void SentryBotGame::drawSuccessScreen(Graphics* graphics) {
         app->localization->composeText((short)0, (short)183, smallBuffer);
         smallBuffer->dehyphenate();
         smallBuffer->wrapText(50, '\n');
-        smallBuffer->translateText();
-        smallBuffer->wrapText(50, '\n');
+        if (!smallBuffer->isTranslated) {
+            smallBuffer->translateText();
+            if (smallBuffer->isTranslated) {
+                smallBuffer->wrapText(50, '\n');
+            }
+        }
         graphics->drawString(smallBuffer, n4 + 10, n3 + 27, 20, false);
 
         smallBuffer->setLength(0);
@@ -473,8 +485,12 @@ void SentryBotGame::drawSuccessScreen(Graphics* graphics) {
         app->localization->composeText((short)0, (short)184, smallBuffer);
         smallBuffer->dehyphenate();
         smallBuffer->wrapText(50, '\n');
-        smallBuffer->translateText();
-        smallBuffer->wrapText(50, '\n');
+        if (!smallBuffer->isTranslated) {
+            smallBuffer->translateText();
+            if (smallBuffer->isTranslated) {
+                smallBuffer->wrapText(50, '\n');
+            }
+        }
         graphics->drawString(smallBuffer, n4 + 10, n3 + 92, 20, false);
     }
     smallBuffer->dispose();

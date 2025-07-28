@@ -686,7 +686,7 @@ GLuint Graphics::CreateGlyphTexture(TTF_Font* font, const char* chars, int* outA
     return textureID;
 }
 
-void Graphics::renderGlyph(wchar_t c,int x, int y, int rotateMode) {
+void Graphics::renderGlyph(char32_t c,int x, int y, int rotateMode) {
     auto chars = char32_to_char_ptr(c);
     auto font = CAppContainer::getInstance()->app->canvas->ttfFont;
     GlyphCacheItem* item = GlyphCache_Find(c, font);

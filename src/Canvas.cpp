@@ -7698,8 +7698,12 @@ void Canvas::drawMiniGameHelpText(Graphics* graphics, int i, int i2) {
 	textBuff1->setLength(0);
 	app->localization->composeText(i2, textBuff1);
     textBuff1->wrapText(0x31, '\n');
-    textBuff1->translateText();
-    textBuff1->wrapText(0x31, '\n');
+    if (!textBuff1->isTranslated) {
+        textBuff1->translateText();
+        if (textBuff1->isTranslated){
+           textBuff1->wrapText(0x31, '\n');
+        }
+    }
     iVar1 = textBuff1->getNumLines();
 	this->helpTextNumberOfLines = iVar1;
 

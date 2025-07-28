@@ -432,8 +432,12 @@ void HackingGame::drawGameScreen(Graphics* graphics) {
 		}
 
         smallBuffer->wrapText(47, 0xAu);
-        smallBuffer->translateText();
-		smallBuffer->wrapText(47, 0xAu);
+        if (!smallBuffer->isTranslated) {
+            smallBuffer->translateText();
+            if (smallBuffer->isTranslated) {
+                smallBuffer->wrapText(47, 0xAu);
+            }
+        }
 		graphics->drawString(smallBuffer, 12, 215, 4, false);
 		app->canvas->setRightSoftKey(0, 30);
 
@@ -461,8 +465,12 @@ void HackingGame::drawGameScreen(Graphics* graphics) {
 		smallBuffer->setLength(0);
 		app->localization->composeText(0, 189, smallBuffer);
 		smallBuffer->wrapText(47, 0xAu);
-        smallBuffer->translateText();
-		smallBuffer->wrapText(47, 0xAu);
+        if (!smallBuffer->isTranslated) {
+            smallBuffer->translateText();
+            if (smallBuffer->isTranslated) {
+                smallBuffer->wrapText(47, 0xAu);
+            }
+        }
 		graphics->drawString(smallBuffer, 75, 215, 4, false);
 
 		int rectX = 142;
