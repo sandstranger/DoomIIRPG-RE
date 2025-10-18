@@ -681,7 +681,6 @@ Text* Text::append(uint8_t c) {
 }
 
 Text* Text::append(const char* c) {
-    SDL_Log("TRANSLATED_TEXT = %s",c);
 	int i, len;
 	len = std::strlen(c);
 	for (i = 0; i < len; i++) {
