@@ -23,7 +23,6 @@
 #include "Input.h"
 #ifdef ANDROID
 #include <SDL_main.h>
-#include <jni.h>
 #endif
 
 void drawView(SDLGL* sdlGL);
@@ -148,24 +147,23 @@ void drawView(SDLGL *sdlGL) {
 
 #ifdef ANDROID
 extern "C" {
-JNIEXPORT void JNICALL Java_com_mobilerpgpack_phone_engine_activity_DoomRpgSeriesGameActivity_resumeSound(JNIEnv *env, jobject thisObject) {
+void resumeSound() {
     CAppContainer::getInstance()->resumeOpenAL();
 }
 
-JNIEXPORT void JNICALL Java_com_mobilerpgpack_phone_engine_activity_DoomRpgSeriesGameActivity_pauseSound(JNIEnv *env, jobject thisObject) {
+void pauseSound() {
     CAppContainer::getInstance()->suspendOpenAL();
 }
-}
 
-extern "C" {
-JNIEXPORT jboolean JNICALL Java_com_mobilerpgpack_phone_engine_activity_DoomRpgSeriesGameActivity_needToShowScreenControls(JNIEnv *env, jobject thisObject) {
+bool needToShowScreenControls() {
     CAppContainer *appContainer = CAppContainer::getInstance();
     if (appContainer == nullptr || appContainer->app == nullptr || appContainer->app->canvas == nullptr){
         return true;
     }
     int currentCanvasState = appContainer->app->canvas->state;
     return currentCanvasState ==Canvas::ST_PLAYING || currentCanvasState ==Canvas::ST_COMBAT ||
-    currentCanvasState == Canvas::ST_CHARACTER_SELECTION;
+           currentCanvasState == Canvas::ST_CHARACTER_SELECTION;
 }
 }
+
 #endif
