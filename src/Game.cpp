@@ -2034,9 +2034,6 @@ void Game::loadConfig() {
 			app->canvas->vibrateEnabled = IS.readBoolean();
 			app->player->enableHelp = IS.readBoolean();
 			int l = IS.readInt();
-			if (l != app->localization->defaultLanguage) {
-				app->localization->setLanguage(l);
-			}
 			app->player->currentLevelDeaths = IS.readInt();
 			app->player->totalDeaths = IS.readInt();
 			int animFrames = IS.readInt();
@@ -2133,6 +2130,10 @@ void Game::loadConfig() {
                 SDL_memcpy(keyMapping, lKeyMapping, sizeof(keyMapping));
                 SDL_memcpy(keyMappingTemp, keyMapping, sizeof(keyMapping));
                 this->saveConfig();
+            } else{
+                if (l != app->localization->defaultLanguage) {
+                    app->localization->setLanguage(l);
+                }
             }
 			IS.close();
 			app->sound->updateVolume();
