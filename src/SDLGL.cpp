@@ -71,9 +71,12 @@ bool SDLGL::Initialize() {
 #ifdef ANDROID
         flags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_FULLSCREEN;
 
+        bool useLegacyOpenGLES2_0 = strcmp(getenv("LIBGL_ES"), "2") == 0;
+        SDL_Log(useLegacyOpenGLES2_0 ? "Legacy OpenGL ES 2.0 is using for rendering" :
+                "OpenGL ES 3.2 is using for rendering");
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, useLegacyOpenGLES2_0 ? 2 : 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, useLegacyOpenGLES2_0 ? 0 : 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_NO_ERROR, 1);
 
         SDL_DisplayMode displayMode;
