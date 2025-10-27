@@ -35,12 +35,8 @@
 #include <cstdlib>
 #include <string>
 
-static std::string pathToTTFFont;
-
 Canvas::Canvas() {
     std::memset(this, 0, sizeof(Canvas));
-    pathToTTFFont = std::getenv("ANDROID_GAME_PATH");
-    pathToTTFFont +="/UnifontExMono.ttf";
 }
 
 Canvas::~Canvas() {
@@ -175,6 +171,9 @@ bool Canvas::startup() {
 		this->startupMap = 1;
 		this->skipIntro = false;
 		this->tellAFriend = false;
+        std::string pathToTTFFont = SDL_AndroidGetExternalStoragePath();
+        pathToTTFFont +="/UnifontExMono.ttf";
+
         this->ttfFont = TTF_OpenFont(pathToTTFFont.c_str(), 16);
 
 		app->beginImageLoading();
