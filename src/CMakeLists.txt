@@ -30,8 +30,6 @@ target_link_libraries(${PROJECT_NAME}
 	${HASH_LIBRARY_TGT_NAME})
 else ()
 	add_library(${PROJECT_NAME} SHARED ${HEADER_FILES} ${SOURCE_FILES})
-	target_include_directories(${PROJECT_NAME} PUBLIC ${OPENAL_INCLUDE_DIR})
-	target_link_libraries(${PROJECT_NAME} SDL2::SDL2 ZLIB::ZLIB ${OPENAL_LIBRARY} ${OPENGL_opengl_LIBRARY}
-			${HASH_LIBRARY_TGT_NAME} ${SDL2_TTF_LIBRARY} ${TRANSLATOR_LIBRARY})
+	target_link_libraries(${PROJECT_NAME} PUBLIC ${HASH_LIBRARY_TGT_NAME})
 endif ()
 
