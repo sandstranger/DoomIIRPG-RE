@@ -30,6 +30,6 @@ target_link_libraries(${PROJECT_NAME}
 	${HASH_LIBRARY_TGT_NAME})
 else ()
 	add_library(${PROJECT_NAME} SHARED ${HEADER_FILES} ${SOURCE_FILES})
-	target_link_libraries(${PROJECT_NAME} PUBLIC ${HASH_LIBRARY_TGT_NAME})
+	target_link_libraries(${PROJECT_NAME} PRIVATE ${HASH_LIBRARY_TGT_NAME})
 endif ()
 
