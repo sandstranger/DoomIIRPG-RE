@@ -41,7 +41,7 @@ int main(int argc, char* args[]) {
     
     ZipFile zipFile;
 #ifdef ANDROID
-    zipFile.openZipFile(getenv("RESOURCE_FILE_NAME"));
+    zipFile.openZipFile(getenv("PATH_TO_RESOURCES"));
 #else
     zipFile.openZipFile("Doom 2 RPG.ipa");
 #endif
