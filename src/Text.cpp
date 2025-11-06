@@ -152,6 +152,7 @@ void Localization::unloadText(int index) {
 }
 
 void Localization::setLanguage(int language) {
+    return;
 	this->defaultLanguage = language;
 	this->beginTextLoading();
 	for (int i = 0; i < (Localization::MAXTEXT); ++i) {
