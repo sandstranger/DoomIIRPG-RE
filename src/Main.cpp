@@ -164,6 +164,10 @@ bool needToShowScreenControls() {
     return currentCanvasState ==Canvas::ST_PLAYING || currentCanvasState ==Canvas::ST_COMBAT ||
            currentCanvasState == Canvas::ST_CHARACTER_SELECTION;
 }
+
+bool needToInvokeMouseButtonsEvents(){
+    return true;
+}
 }
 
 #endif
