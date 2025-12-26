@@ -48,8 +48,6 @@ bool SDLGL::Initialize() {
 
 	if (!this->initialized) {
 
-        SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
-
         SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 		if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 			printf("Could not initialize SDL: %s", SDL_GetError());
