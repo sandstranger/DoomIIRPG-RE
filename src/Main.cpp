@@ -46,6 +46,7 @@ int main(int argc, char* args[]) {
     zipFile.openZipFile("Doom 2 RPG.ipa");
 #endif
 
+    SDL_SetHint(SDL_HINT_TV_REMOTE_AS_JOYSTICK, "0");
     SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
     SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT, "1");
     SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT_CORRELATE_XINPUT, "1");
