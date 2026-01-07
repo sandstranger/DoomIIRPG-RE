@@ -67,7 +67,7 @@ bool SDLGL::Initialize() {
 		//this->winVidHeight = 900;
 
 #ifdef ANDROID
-        flags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_FULLSCREEN;
+        flags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_FULLSCREEN_DESKTOP;
 
         bool useLegacyOpenGLES2_0 = strcmp(getenv("LIBGL_ES"), "2") == 0;
         SDL_Log(useLegacyOpenGLES2_0 ? "Legacy OpenGL ES 2.0 is using for rendering" :
