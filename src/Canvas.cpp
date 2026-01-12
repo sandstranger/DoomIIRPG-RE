@@ -171,8 +171,9 @@ bool Canvas::startup() {
 		this->startupMap = 1;
 		this->skipIntro = false;
 		this->tellAFriend = false;
-        std::string pathToTTFFont = getenv("PATH_TO_USER_FOLDER") + std::string("/UnifontExMono.ttf");
-        
+        std::string pathToTTFFont = std::string (getenv("PATH_TO_USER_FOLDER"))  +
+                std::string("/UnifontExMono.ttf");
+
         this->ttfFont = TTF_OpenFont(pathToTTFFont.c_str(), 16);
 
 		app->beginImageLoading();
