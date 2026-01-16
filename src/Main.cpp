@@ -23,9 +23,18 @@
 #include "Input.h"
 #ifdef ANDROID
 #include <SDL_main.h>
+#include <string>
 #endif
 
+using namespace std;
+
 void drawView(SDLGL* sdlGL);
+
+#if ANDROID
+static string g_pathToIPA;
+string g_pathToUserFolder;
+string g_pathToSDLControllerDB;
+#endif
 
 #ifdef ANDROID
 int SDL_main(int argc, char **argv) {
@@ -34,14 +43,14 @@ int main(int argc, char* args[]) {
 #endif
 
 #ifdef ANDROID
-    chdir(getenv("PATH_TO_USER_FOLDER"));
+    chdir(g_pathToUserFolder.c_str());
 #endif
 
     int		UpTime = 0;
     
     ZipFile zipFile;
 #ifdef ANDROID
-    zipFile.openZipFile(getenv("PATH_TO_RESOURCES"));
+    zipFile.openZipFile(g_pathToIPA.c_str());
 #else
     zipFile.openZipFile("Doom 2 RPG.ipa");
 #endif
@@ -165,6 +174,7 @@ void drawView(SDLGL *sdlGL) {
 
 #ifdef ANDROID
 extern "C" {
+
 __attribute__((used)) __attribute__((visibility("default")))
 void onNativeResume() {
     CAppContainer::getInstance()->resumeOpenAL();
@@ -190,6 +200,17 @@ bool needToInvokeMouseButtonsEvents(){
 __attribute__((used)) __attribute__((visibility("default")))
 bool needToReInitGameControllers (){
     return false;
+}
+
+__attribute__((used)) __attribute__((visibility("default")))
+void setPathsToResources (const char *pathToArchive, const char *pathToUserFolder) {
+    g_pathToUserFolder =pathToUserFolder;
+    g_pathToIPA = pathToArchive;
+}
+
+__attribute__((used)) __attribute__((visibility("default")))
+void setPathToSDLControllerDB (const char *pathToSDLControllerDB){
+    g_pathToSDLControllerDB = pathToSDLControllerDB;
 }
 }
 
