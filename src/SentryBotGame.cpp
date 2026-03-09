@@ -127,7 +127,7 @@ void SentryBotGame::initGame(ScriptThread* scriptThread, short botType) {
 void SentryBotGame::handleInput(int action) {
     Applet* app = CAppContainer::getInstance()->app;
 
-    if ((this->stateVars[2] == 2 || (this->stateVars[2] == 1 && this->gamePlayedFromMainMenu)) && (action == 7 || action == 15 || action == 6)) {
+    if (action == 5 || (this->stateVars[2] == 2 || (this->stateVars[2] == 1 && this->gamePlayedFromMainMenu)) && (action == 7 || action == 15 || action == 6)) {
         this->endGame(0);
         return;
     }
