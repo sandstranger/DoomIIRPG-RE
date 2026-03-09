@@ -119,6 +119,7 @@ void SentryBotGame::initGame(ScriptThread* scriptThread, short botType) {
     this->m_sentryBotButtons->AddButton(button04);
 
     this->touched = false;
+    gameFailed = false;
     this->currentPress_x = 0;
     this->currentPress_y = 0;
     SentryBotGame::wasTouched = false;
@@ -127,7 +128,7 @@ void SentryBotGame::initGame(ScriptThread* scriptThread, short botType) {
 void SentryBotGame::handleInput(int action) {
     Applet* app = CAppContainer::getInstance()->app;
 
-    if (action == 5 || (this->stateVars[2] == 2 || (this->stateVars[2] == 1 && this->gamePlayedFromMainMenu)) && (action == 7 || action == 15 || action == 6)) {
+    if ((action == 5 && gameFailed) || (this->stateVars[2] == 2 || (this->stateVars[2] == 1 && this->gamePlayedFromMainMenu)) && (action == 7 || action == 15 || action == 6)) {
         this->endGame(0);
         return;
     }
@@ -321,6 +322,7 @@ void SentryBotGame::updateGame(Graphics* graphics) {
 }
 
 void SentryBotGame::drawFailureScreen(Graphics* graphics) {
+    gameFailed = true;
     Applet* app = CAppContainer::getInstance()->app;
     graphics->drawImage(this->imgMatrixSkip_BG, 0, 0, 0, 0, 0);
     app->canvas->setLeftSoftKey((short)0, (short)30);

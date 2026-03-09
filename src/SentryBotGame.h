@@ -10,6 +10,7 @@ class SentryBotGame
 {
 private:
 	static bool wasTouched;
+	bool gameFailed;
 
 public:
 	int touchMe;
