@@ -8,6 +8,8 @@
 #include "Sounds.h"
 #include "JavaStream.h"
 
+#include "alext.h"
+
 Sound::Sound() {
 	std::memset(this, 0, sizeof(Sound));
 }
@@ -99,10 +101,14 @@ void Sound::openAL_Close() {
 }
 
 void Sound::openAL_SetSystemVolume(int volume) {
-	if (volume > 100) {
-		volume = 100;
-	}
-	alListenerf(AL_GAIN, (float)volume / 100.0f);
+    if (alDevice == nullptr){
+        return;
+    }
+    if (volume == 0){
+        alcDevicePauseSOFT(alDevice);
+    } else{
+        alcDeviceResumeSOFT(alDevice);
+    }
 }
 
 void Sound::openAL_SetVolume(ALuint source, int volume) {

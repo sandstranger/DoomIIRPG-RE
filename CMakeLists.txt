@@ -9,6 +9,8 @@ else()
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 endif()
 
+add_definitions(-DAL_ALEXT_PROTOTYPES)
+
 add_compile_options(
     -fsigned-char         # Force char to be signed
 )
