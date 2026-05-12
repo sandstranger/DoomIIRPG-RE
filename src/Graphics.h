@@ -1,5 +1,9 @@
 #include <SDL_pixels.h>
+#ifndef ANDROID
 #include <SDL_opengl.h>
+#else
+#include "SDLGL.h"
+#endif
 #include "SDL_ttf.h"
 #include <unordered_map>
 

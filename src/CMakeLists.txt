@@ -29,6 +29,7 @@ target_link_libraries(${PROJECT_NAME}
 	OpenGL::GL
 	${HASH_LIBRARY_TGT_NAME})
 else ()
+	include_directories("${CMAKE_CURRENT_SOURCE_DIR}/glad")
 	add_library(${PROJECT_NAME} SHARED ${HEADER_FILES} ${SOURCE_FILES})
 	target_link_libraries(${PROJECT_NAME} PRIVATE ${HASH_LIBRARY_TGT_NAME})
 endif ()

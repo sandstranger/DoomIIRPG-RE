@@ -79,7 +79,7 @@ bool SDLGL::Initialize() {
 		//this->winVidHeight = 900;
 
 #ifdef ANDROID
-        flags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_FULLSCREEN_DESKTOP;
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
         SDL_Log(g_useGLES2_0 ? "Legacy OpenGL ES 2.0 is using for rendering" :
                 "OpenGL ES 3.1 is using for rendering");
@@ -120,6 +120,15 @@ bool SDLGL::Initialize() {
 		this->updateVideo();
 
 		this->glcontext = SDL_GL_CreateContext(window);
+
+#if ANDROID
+		if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+			SDL_GL_DeleteContext(this->glcontext);
+			SDL_DestroyWindow(window);
+			SDL_Quit();
+			return false;
+		}
+#endif
 
 		// now you can make GL calls.
 		glClearColor(0, 0, 0, 1);
