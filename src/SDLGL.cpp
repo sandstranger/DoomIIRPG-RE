@@ -3,8 +3,9 @@
 
 #include "SDLGL.h"
 #include "App.h"
-
 #if ANDROID
+#include "AngleShaderCache.h"
+
 static bool g_useGLES2_0 = false;
 #endif
 
@@ -122,6 +123,8 @@ bool SDLGL::Initialize() {
 		this->glcontext = SDL_GL_CreateContext(window);
 
 #if ANDROID
+		SDL_GL_MakeCurrent(window, this->glcontext );
+		angle_blobcache_install("doom_2_rpg_re");
 		if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
 			SDL_GL_DeleteContext(this->glcontext);
 			SDL_DestroyWindow(window);
