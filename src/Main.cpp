@@ -24,6 +24,7 @@
 #ifdef ANDROID
 #include <SDL_main.h>
 #include <string>
+#include "SwappyController.h"
 #endif
 
 using namespace std;
@@ -121,6 +122,9 @@ int main(int argc, char* args[]) {
     CAppContainer::getInstance()->~CAppContainer();
     zipFile.closeZipFile();
     sdlGL.~SDLGL();
+#ifdef ANDROID
+    DestroySwappy();
+#endif
     input.~Input();
 	return 0;
 }
@@ -168,8 +172,12 @@ void drawView(SDLGL *sdlGL) {
 
     CAppContainer::getInstance()->DoLoop(passedTime);
 
+#ifdef ANDROID
+    if (SwappySwapBuffers()){
+        return;
+    }
+#endif
     SDL_GL_SwapWindow(sdlGL->window);  // Swap the window/pBmp to display the result.
-    
 }
 
 #ifdef ANDROID
