@@ -6,6 +6,7 @@
 #if ANDROID
 #include "AngleShaderCache.h"
 #include "SwappyController.h"
+#include "CAppContainer.h"
 
 static bool g_useGLES2_0 = false;
 #endif
@@ -48,12 +49,30 @@ SDLGL::~SDLGL() {
 	}
 }
 
-#if ANDROID
+#ifdef ANDROID
 extern "C" {
 __attribute__((used)) __attribute__((visibility("default")))
 void setUseGLES2_0State(const bool useGLES2_0) {
     g_useGLES2_0 = useGLES2_0;
 }
+}
+
+static int SDLCALL AndroidLifeCycleEventFilter(void*, SDL_Event* event)
+{
+	CAppContainer *appContainer = CAppContainer::getInstance();
+	if (appContainer == nullptr){
+		return 1;
+	}
+	switch (event->type)
+	{
+		case SDL_APP_WILLENTERBACKGROUND:
+			appContainer->suspendOpenAL();
+			break;
+		case SDL_APP_DIDENTERFOREGROUND:
+			appContainer->resumeOpenAL();
+			break;
+	}
+	return 1;
 }
 #endif
 
@@ -66,7 +85,9 @@ bool SDLGL::Initialize() {
 		if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 			printf("Could not initialize SDL: %s", SDL_GetError());
 		}
-
+#ifdef ANDROID
+		SDL_AddEventWatch(AndroidLifeCycleEventFilter, nullptr);
+#endif
 		flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN /* | SDL_WINDOW_RESIZABLE*/;
 		// Set the highdpi flags - this makes a big difference on Macs with
 		// retina displays, especially when using small window sizes.

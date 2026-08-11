@@ -810,11 +810,6 @@ void Input::handleEvents() noexcept {
     int i, j;
 
     while (SDL_PollEvent(&sdlEvent) != 0) {
-#if ANDROID
-        if (sdlEvent.type == SDL_APP_DIDENTERFOREGROUND && activityOrientationChangerInstance!= nullptr){
-            activityOrientationChangerInstance();
-        }
-#endif
         switch (sdlEvent.type) {
             case SDL_QUIT: {
                 printf("handleEvents::SDL_QUIT\n");
@@ -822,7 +817,7 @@ void Input::handleEvents() noexcept {
             }   break;
 
             case SDL_WINDOWEVENT: {
-                if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED) {
+                if (sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
                     printf("SDL_WINDOWEVENT_RESIZED\n");
                     SDL_GL_GetDrawableSize(sdlGL->window, &winVidWidth, &winVidHeight);
                     sdlGL->updateWinVid(winVidWidth, winVidHeight);
