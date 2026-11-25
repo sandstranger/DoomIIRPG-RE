@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "Bits.h"
 #include <algorithm>
 
 #include "CAppContainer.h"
@@ -204,7 +205,7 @@ int Combat::playerSeq() {
         if (this->punchingMonster == 1) {
             this->punchingMonster = 2;
         }
-        if ((1 << this->attackerWeaponId & 0x77FF) == 0x0) {
+        if ((bit32(this->attackerWeaponId) & 0x77FF) == 0x0) {
             this->crFlags |= 0x40;
         }
         if (this->weapons[this->attackerWeapon + Combat::WEAPON_FIELD_AMMOTYPE] != 0) {
@@ -224,7 +225,7 @@ int Combat::playerSeq() {
             }
         }
         if (this->targetType == 2) {
-            if ((1 << this->attackerWeaponId & 0x2) == 0x0) {
+            if ((bit32(this->attackerWeaponId) & 0x2) == 0x0) {
                 this->crFlags |= 0x20;
             }
             app->player->ce->calcCombat(app->player->ce, this->curTarget, false, this->worldDist, this->targetSubType);
@@ -326,7 +327,7 @@ int Combat::playerSeq() {
             this->animLoopCount = animLoopCount;
         }
         this->launchProjectile();
-        if ((1 << this->attackerWeaponId & 0x2406) == 0x0) {
+        if ((bit32(this->attackerWeaponId) & 0x2406) == 0x0) {
             int n4 = 2;
             if (this->attackerWeaponId == 11) {
                 n4 = 6;
@@ -387,7 +388,7 @@ int Combat::playerSeq() {
                 this->curTarget->died(true, app->player->getPlayerEnt());
                 this->targetKilled = true;
             }
-            else if (--this->animLoopCount > 0 && (1 << this->targetType & n6) == 0x0 && !this->punchMissed && this->targetType != 10) {
+            else if (--this->animLoopCount > 0 && (bit32(this->targetType) & n6) == 0x0 && !this->punchMissed && this->targetType != 10) {
                 this->stage = 0;
                 this->animEndTime = (this->animTime = 0);
                 this->nextStageTime = 0;
@@ -731,8 +732,8 @@ void Combat::drawWeapon(int sx, int sy) {
     int wpX = wpIdleX;
     int wpY = wpIdleY;
     int gameTime = app->gameTime;
-    int n14 = 1 << weapon;
-    if ((1 << weapon & 0x0) != 0x0 && (this->punchingMonster == 2 || this->punchingMonster == 3)) {
+    int n14 = bit32(weapon);
+    if ((bit32(weapon) & 0x0) != 0x0 && (this->punchingMonster == 2 || this->punchingMonster == 3)) {
         b = true;
     }
     bool b5 = b2 || (app->canvas->state == Canvas::ST_COMBAT && this->curAttacker == nullptr && this->nextStage == 1);
@@ -826,7 +827,7 @@ void Combat::drawWeapon(int sx, int sy) {
         if (b6 | ((weapon == 13 || weapon == 8) && b5)) {
             frame = 1;
         }
-        if (b && (1 << weapon & 0x181) != 0x0) {
+        if (b && (bit32(weapon) & 0x181) != 0x0) {
             int xf = 40;
             int yf = 40;
             if (!app->render->_gles->isInit) {  // [GEC] Adjusted like this to match the XY position on the GL version
@@ -879,7 +880,7 @@ int Combat::calcHit(Entity* entity) {
     if (entity->def->eType != Enums::ET_ATTACK_INTERACTIVE) {
         return 1;
     }
-    if ((this->tableCombatMasks[entity->def->parm] & 1 << app->player->ce->weapon) != 0x0) {
+    if ((this->tableCombatMasks[entity->def->parm] & bit32(app->player->ce->weapon)) != 0x0) {
         return 1;
     }
     return 0;
@@ -892,7 +893,7 @@ void Combat::explodeOnMonster() {
         this->explodeThread = nullptr;
     }
     app->render->shotsFired = true;
-    if ((1 << this->attackerWeaponId & 0x2) != 0x0 && this->hitType == 0) {
+    if ((bit32(this->attackerWeaponId) & 0x2) != 0x0 && this->hitType == 0) {
         app->render->shotsFired = false;
     }
     else if (this->curTarget->monster != nullptr && this->curTarget->def->eType == Enums::ET_MONSTER && (this->curTarget->info & 0x40000) == 0x0) {
@@ -1320,7 +1321,7 @@ void Combat::updateProjectile() {
                     renderMode = 4;
                     if (this->curTarget != nullptr && (this->crFlags & 0x1007) != 0x0) {
                         EntityMonster* monster = this->curTarget->monster;
-                        if (monster != nullptr && (1 << this->curTarget->def->eSubType & Enums::FEAR_IMMUNE_MONSTERS) == 0x0) {
+                        if (monster != nullptr && (bit32(this->curTarget->def->eSubType) & Enums::FEAR_IMMUNE_MONSTERS) == 0x0) {
                             monster->resetGoal();
                             monster->goalType = 4;
                             monster->goalParam = 3;
@@ -1375,7 +1376,7 @@ void Combat::updateProjectile() {
                 }
                 }
 
-                if (this->curAttacker != nullptr && (1 << app->hud->damageDir & 0x1C) == 0x0 && !b) {
+                if (this->curAttacker != nullptr && (bit32(app->hud->damageDir) & 0x1C) == 0x0 && !b) {
                     this->missileAnim = 0;
                 }
 

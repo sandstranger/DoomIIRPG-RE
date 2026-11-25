@@ -1,3 +1,4 @@
+#include "Bits.h"
 #ifndef __ENTITY_H__
 #define __ENTITY_H__
 
@@ -50,7 +51,7 @@ public:
 	bool aiIsAttackValid();
 	void aiThink(bool b);
 	static bool CheckWeaponMask(char n1, int n2) {
-		return (1 << n1 & n2);
+		return (bit32(n1) & n2);
 	}
 	int aiWeaponForTarget(Entity* entity);
 	LerpSprite* aiInitLerp(int travelTime);

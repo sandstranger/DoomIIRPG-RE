@@ -321,7 +321,7 @@ Image* Applet::createImage(InputStream* inputStream, bool isTransparentMask)
 		img->height = img->piDIB->height;
 	}
 	else {
-		img->~Image();
+		Image::dispose(img);
 		img = nullptr;
 
 		Error("Expected image bpp 4 or 8. Found bpp %d", BitsPerPixel);
@@ -341,7 +341,7 @@ Image* Applet::loadImage(char* fileName, bool isTransparentMask) {
 	img = this->createImage(&iStream, isTransparentMask);
 
 	iStream.close();
-	iStream.~InputStream();
+	iStream.dispose();
 	return img;
 }
 
@@ -391,7 +391,7 @@ void Applet::Error(const char* fmt, ...) {
 
 	SDL_ShowMessageBox(&messageboxdata, NULL);
 
-	CAppContainer::getInstance()->~CAppContainer();
+	CAppContainer::getInstance()->shutdown();
 	exit(0);
 }
 
@@ -480,17 +480,17 @@ void Applet::loadRuntimeImages() {
 		this->hud->imgBottomBarIcons = this->loadImage("Hud_Fill.bmp", true);
 		this->hud->imgHudFill = this->loadImage("Hud_Actions.bmp", true);
 		
-		this->hud->imgPlayerFrameNormal->~Image();
+		Image::dispose(this->hud->imgPlayerFrameNormal);
 		this->hud->imgPlayerFrameNormal = nullptr;
-		this->hud->imgPlayerFrameActive->~Image();
+		Image::dispose(this->hud->imgPlayerFrameActive);
 		this->hud->imgPlayerFrameActive = nullptr;
 
 		this->hud->imgPlayerFrameNormal = this->loadImage("HUD_Player_frame_Normal.bmp", true);
 		this->hud->imgPlayerFrameActive = this->loadImage("HUD_Player_frame_Active.bmp", true);
 
-		this->hud->imgPlayerFaces->~Image();
+		Image::dispose(this->hud->imgPlayerFaces);
 		this->hud->imgPlayerFaces = nullptr;
-		this->hud->imgPlayerActive->~Image();
+		Image::dispose(this->hud->imgPlayerActive);
 		this->hud->imgPlayerActive = nullptr;
 
 		if (this->player->characterChoice == 1) {
@@ -518,35 +518,35 @@ void Applet::loadRuntimeImages() {
 }
 
 void Applet::freeRuntimeImages() {
-	this->canvas->imgMapCursor->~Image();
+	Image::dispose(this->canvas->imgMapCursor);
 	this->canvas->imgMapCursor = nullptr;
-	this->canvas->imgUIImages->~Image();
+	Image::dispose(this->canvas->imgUIImages);
 	this->canvas->imgUIImages = nullptr;
-	this->canvas->imgDialogScroll->~Image();
+	Image::dispose(this->canvas->imgDialogScroll);
 	this->canvas->imgDialogScroll = nullptr;
-	this->hud->imgScope->~Image();
+	Image::dispose(this->hud->imgScope);
 	this->hud->imgScope = nullptr;
-	this->hud->imgDamageVignette->~Image();
+	Image::dispose(this->hud->imgDamageVignette);
 	this->hud->imgDamageVignette = nullptr;
-	this->hud->imgActions->~Image();
+	Image::dispose(this->hud->imgActions);
 	this->hud->imgActions = nullptr;
-	this->hud->imgBottomBarIcons->~Image();
+	Image::dispose(this->hud->imgBottomBarIcons);
 	this->hud->imgBottomBarIcons = nullptr;
-	this->hud->imgHudFill->~Image();
+	Image::dispose(this->hud->imgHudFill);
 	this->hud->imgHudFill = nullptr;
-	this->hud->imgPlayerFaces->~Image();
+	Image::dispose(this->hud->imgPlayerFaces);
 	this->hud->imgPlayerFaces = nullptr;
-	this->hud->imgPlayerActive->~Image();
+	Image::dispose(this->hud->imgPlayerActive);
 	this->hud->imgPlayerActive = nullptr;
-	this->hud->imgDamageVignetteBot->~Image();
+	Image::dispose(this->hud->imgDamageVignetteBot);
 	this->hud->imgDamageVignetteBot = nullptr;
-	this->hud->imgHudTest->~Image();
+	Image::dispose(this->hud->imgHudTest);
 	this->hud->imgHudTest = nullptr;
-	this->hud->imgSentryBotFace->~Image();
+	Image::dispose(this->hud->imgSentryBotFace);
 	this->hud->imgSentryBotFace = nullptr;
-	this->hud->imgSentryBotActive->~Image();
+	Image::dispose(this->hud->imgSentryBotActive);
 	this->hud->imgSentryBotActive = nullptr;
-	this->hud->imgCockpitOverlay->~Image();
+	Image::dispose(this->hud->imgCockpitOverlay);
 	this->hud->imgCockpitOverlay = nullptr;
 }
 

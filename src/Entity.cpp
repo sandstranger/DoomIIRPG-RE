@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "Bits.h"
 #include <algorithm>
 
 #include "CAppContainer.h"
@@ -46,7 +47,7 @@ void Entity::reset() {
 	this->monster = nullptr;
 	this->name = -1;
 	if (this->lootSet) {
-		delete this->lootSet;
+		delete[] this->lootSet;
 	}
 	this->lootSet = nullptr;
 }
@@ -106,7 +107,7 @@ void Entity::initspawn() {
 
     if (this->def->eType != Enums::ET_MONSTER && this->def->eType != Enums::ET_CORPSE) {
         if (this->lootSet) {
-            delete this->lootSet;
+            delete[] this->lootSet;
         }
         this->lootSet = nullptr;
     }
@@ -259,7 +260,7 @@ bool Entity::touchedItem() {
             app->player->give(1, this->def->parm, 1, false);
             int n2 = this->def->parm * 9;
             if (app->combat->weapons[n2 + 5] != 0) {
-                if ((1 << this->def->parm & 0x200) != 0x0) {
+                if ((bit32(this->def->parm) & 0x200) != 0x0) {
                     app->player->give(2, app->combat->weapons[n2 + 4], 8, true);
                 }
                 else {
@@ -542,7 +543,7 @@ void Entity::aiCalcSimpleGoal(bool b) {
     if (this->def->eSubType == Enums::MONSTER_ARCH_VILE && this->aiCalcArchVileGoal()) {
         return;
     }
-    if (app->player->buffs[11] > 0 && !(1 << this->def->eSubType & Enums::FEAR_IMMUNE_MONSTERS)) {
+    if (app->player->buffs[11] > 0 && !(bit32(this->def->eSubType) & Enums::FEAR_IMMUNE_MONSTERS)) {
         this->monster->goalType = 4;
         this->monster->goalParam = 1;
         return;
@@ -556,14 +557,14 @@ void Entity::aiCalcSimpleGoal(bool b) {
     if (b2) {
         this->monster->goalType = 3;
         this->monster->goalParam = 1;
-        if ((1 << this->def->eSubType & Enums::EVADING_MONSTERS)) {
+        if ((bit32(this->def->eSubType) & Enums::EVADING_MONSTERS)) {
             this->monster->flags |= 0x1;
         }
     }
     else {
         this->monster->goalType = 2;
         this->monster->goalParam = 1;
-        if ((1 << this->def->eSubType & Enums::EVADING_MONSTERS)) {
+        if ((bit32(this->def->eSubType) & Enums::EVADING_MONSTERS)) {
             this->monster->flags &= ~0x1;
         }
     }
@@ -601,7 +602,7 @@ void Entity::aiChooseNewGoal(bool b) {
     uint8_t eSubType = this->def->eSubType;
     this->monster->resetGoal();
     this->aiCalcSimpleGoal(b);
-    if ((1 << eSubType & Enums::EVADING_MONSTERS) != 0x0 && this->monster->goalType == 3) {
+    if ((bit32(eSubType) & Enums::EVADING_MONSTERS) != 0x0 && this->monster->goalType == 3) {
         this->monster->goalFlags |= 0x8;
     }
 }
@@ -819,7 +820,7 @@ int Entity::aiWeaponForTarget(Entity* entity) {
                 int n16 = app->render->mapSprites[app->render->S_Y + sprite] >> 6;
 
                 do {
-                    if (app->game->baseVisitedTiles[n16] & 1 << n15){
+                    if (app->game->baseVisitedTiles[n16] & bit32(n15)){
                         b2 = false;
                         break;
                     }
@@ -917,7 +918,7 @@ bool Entity::calcPath(int n, int n2, int n3, int n4, int n5, bool b) {
     int closestPathDist = n6 * n6 + n7 * n7;
     uint8_t* visitOrder = app->game->visitOrder;
     int* visitDist = app->game->visitDist;
-    app->game->visitedTiles[n2] |= 1 << n;
+    app->game->visitedTiles[n2] |= bit32(n);
     bool checkLineOfSight = this->checkLineOfSight(n, n2, n3, n4, n5 | 0x100);
     if ((app->game->lineOfSight == 0 && !checkLineOfSight) || (app->game->lineOfSight == 1 && checkLineOfSight)) {
         if (b) {
@@ -959,7 +960,7 @@ bool Entity::calcPath(int n, int n2, int n3, int n4, int n5, bool b) {
             if (app->game->findMapEntity(n10 << 6, n11 << 6, 256) != nullptr) {
                 continue;
             }
-            if ((app->game->visitedTiles[n11] & 1 << n10) != 0) {
+            if ((app->game->visitedTiles[n11] & bit32(n10)) != 0) {
                 continue;
             }
             visitOrder[n8] = b2;
@@ -1014,7 +1015,7 @@ bool Entity::calcPath(int n, int n2, int n3, int n4, int n5, bool b) {
         }
         int interactClipMask = app->game->interactClipMask;
         if (app->game->traceEntity != nullptr) {
-            interactClipMask = 1 << app->game->traceEntity->def->eType;
+            interactClipMask = bit32(app->game->traceEntity->def->eType);
         }
         if (interactClipMask == 0 || (interactClipMask & app->game->interactClipMask) != 0x0) {
             ++app->game->pathDepth;
@@ -1124,7 +1125,7 @@ void Entity::aiReachedGoal_MOVE() {
     EntityMonster* monster = this->monster;
     EntityDef* def = this->def;
     this->info &= ~0x10000000;
-    if (monster->goalType != 4 && monster->goalType != 5 && ((1 << def->eSubType & Enums::MOVE2ATTACK_MONSTERS) || ((1 << def->eSubType & Enums::EVADING_MONSTERS) && !(monster->flags & 0x1)))) {
+    if (monster->goalType != 4 && monster->goalType != 5 && ((bit32(def->eSubType) & Enums::MOVE2ATTACK_MONSTERS) || ((bit32(def->eSubType) & Enums::EVADING_MONSTERS) && !(monster->flags & 0x1)))) {
         Entity* target = &app->game->entities[1];
         int aiWeaponForTarget = this->aiWeaponForTarget(target);
         if (aiWeaponForTarget != -1) {
@@ -1139,7 +1140,7 @@ void Entity::aiReachedGoal_MOVE() {
             return;
         }
     }
-    if ((1 << def->eSubType & Enums::EVADING_MONSTERS) != 0x0) {
+    if ((bit32(def->eSubType) & Enums::EVADING_MONSTERS) != 0x0) {
         monster->flags |= 0x1;
     }
     if ((monster->goalFlags & 0x10) != 0x0) {
@@ -1949,7 +1950,7 @@ void Entity::updateMonsterFX() {
     Applet* app = CAppContainer::getInstance()->app;
     if (nullptr != this->monster) {
         for (int i = 0; i < 5; ++i) {
-            int n = 1 << i;
+            int n = bit32(i);
             int n2 = this->monster->monsterEffects;
             if ((n2 & n) != 0x0) {
                 int n3 = 5 + i * 4;
@@ -2000,7 +2001,7 @@ void Entity::updateMonsterFX() {
 
 void Entity::populateDefaultLootSet() {
     if (this->lootSet) {
-        delete this->lootSet;
+        delete[] this->lootSet;
         this->lootSet = nullptr;
     }
 

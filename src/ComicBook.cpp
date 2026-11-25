@@ -957,11 +957,11 @@ void ComicBook::TouchMove(int x, int y)
 void ComicBook::DeleteImages() {
     this->isLoaded = false;
     for (int i = 0; i < 17; i++) {
-        this->imgComicBook[i]->~Image();
+        Image::dispose(this->imgComicBook[i]);
         this->imgComicBook[i] = nullptr;
     }
     for (int i = 0; i < 39; i++) {
-        this->imgiPhoneComicBook[i]->~Image();
+        Image::dispose(this->imgiPhoneComicBook[i]);
         this->imgiPhoneComicBook[i] = nullptr;
     }
     this->comicBookIndex = 0;

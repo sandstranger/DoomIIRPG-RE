@@ -35,8 +35,10 @@ public:
 	InputStream();
 	// Destructor
 	~InputStream();
+	void dispose();	// what IS.~InputStream() was for: the object lives on (and is destroyed once, at its scope's end)
     uint8_t* getTop();
     const uint8_t* getData();
+    const uint8_t* readBytes(int n);	// the n bytes at the cursor, or zeroes past the data's end
     int getFileSize();
     void offsetCursor(int offset);
 	bool startup();
@@ -77,6 +79,7 @@ public:
 	OutputStream();
 	// Destructor
 	~OutputStream();
+	void dispose();	// as InputStream's
 
 	int openFile(const char* fileName, int openMode);
 	void close();

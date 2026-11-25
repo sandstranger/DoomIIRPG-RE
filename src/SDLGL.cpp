@@ -37,7 +37,10 @@ SDLGL::SDLGL() {
 }
 
 SDLGL::~SDLGL() {
-	if (this) {
+	this->shutdown();
+}
+
+void SDLGL::shutdown() {
 		if (initialized) {
 			if (this->window) {
 				SDL_SetWindowFullscreen(this->window, 0);
@@ -45,8 +48,10 @@ SDLGL::~SDLGL() {
 			SDL_GL_DeleteContext(glcontext);
 			SDL_DestroyWindow(window);
 			SDL_Quit();
+			this->glcontext = nullptr;
+			this->window = nullptr;
+			this->initialized = false;
 		}
-	}
 }
 
 #ifdef ANDROID
@@ -157,6 +162,9 @@ bool SDLGL::Initialize() {
 
 		// now you can make GL calls.
 		glClearColor(0, 0, 0, 1);
+		// the textures' pixels are packed tight (16 bit ones at widths of 1, 3, ...): at the default alignment of 4
+		// GL read their rows padded, past the end of the buffers
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 #ifdef ANDROID
 		if (!SwappySwapBuffers()) {
@@ -222,7 +230,7 @@ void SDLGL::Error(const char* fmt, ...)
 	//DoomRPG_FreeAppData(doomRpg);
 	//SDL_CloseAudio();
 	//SDL_Close();
-	SDLGL::~SDLGL();
+	this->shutdown();	// (it destroyed itself here, then CAppContainer's exit-time destructor did again)
 	exit(0);
 }
 

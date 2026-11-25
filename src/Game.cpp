@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "Bits.h"
 #include <algorithm>
 #include <cstdio>
 
@@ -130,7 +131,7 @@ void Game::unlinkWorldEntity(int i, int i2) {
 	Entity* nextOnTile = this->entityDb[linkIndex];
 
 	Entity* entity = &this->entities[0];
-	this->baseVisitedTiles[i2] &= ~(1 << i);
+	this->baseVisitedTiles[i2] &= ~(bit32(i));
 	if (nextOnTile == entity) {
 		this->entityDb[linkIndex] = nullptr;
 		app->render->mapFlags[linkIndex] &= 0xFFFFFFFE;
@@ -181,7 +182,7 @@ void Game::linkWorldEntity(int i, int i2) {
 	entity->prevOnTile = nullptr;
 	entity->linkIndex = linkIndex;
 
-	this->baseVisitedTiles[i2] |= 1 << i;
+	this->baseVisitedTiles[i2] |= bit32(i);
 	app->render->mapFlags[linkIndex] |= 0x1;
 }
 
@@ -223,7 +224,7 @@ void Game::trace(int n, int n2, int n3, int traceCollisionX, int traceCollisionY
 			Entity* nextOnTile = this->entityDb[i + 32 * j];
 			if (nextOnTile != nullptr) {
 				while (nextOnTile != nullptr) {
-					if (nextOnTile != entity && 0x0 != (n4 & 1 << nextOnTile->def->eType)) {
+					if (nextOnTile != entity && 0x0 != (n4 & bit32(nextOnTile->def->eType))) {
 						if (nextOnTile->def->eType != 0) {
 							int sprite = nextOnTile->getSprite();
 							int destX;
@@ -708,7 +709,7 @@ void Game::prepareMonsters() {
 
 	int n = app->canvas->loadMapID - 1;
 	app->player->fillMonsterStats();
-	if (!this->isLoaded && 0x0 != (app->player->completedLevels & 1 << n) && app->player->monsterStats[0] == app->player->monsterStats[1]) {
+	if (!this->isLoaded && 0x0 != (app->player->completedLevels & bit32(n)) && app->player->monsterStats[0] == app->player->monsterStats[1]) {
 		int n2 = 0;
 		int n3 = app->player->monsterStats[1];
 		int n4 = n3 - app->player->monsterStats[0];
@@ -747,7 +748,7 @@ Entity* Game::findMapEntity(int n, int n2, int n3) {
 		return &this->entities[1];
 	}
 	for (Entity* entity = this->findMapEntity(n, n2); entity != nullptr; entity = entity->nextOnTile) {
-		if ((n3 & 1 << entity->def->eType) != 0x0) {
+		if ((n3 & bit32(entity->def->eType)) != 0x0) {
 			return entity;
 		}
 	}
@@ -1621,7 +1622,7 @@ void Game::saveWorldState(OutputStream* OS, bool b) {
 			n = 0;
 		}
 		if ((app->render->lineFlags[j >> 1] & 8 << ((j & 0x1) << 2)) != 0x0) {
-			n |= 1 << n2;
+			n |= bit32(n2);
 		}
 		++n2;
 	}
@@ -1658,11 +1659,11 @@ void Game::saveWorldState(OutputStream* OS, bool b) {
 				n5 = 1;
 			}
 			if (n5 != 0) {
-				v |= 1 << n4;
+				v |= bit32(n4);
 			}
 			++n4;
 			if (0x0 != (mapSpriteInfo[n3] & 0x200000)) {
-				v |= 1 << n4;
+				v |= bit32(n4);
 			}
 		}
 		OS->writeByte(v);
@@ -1671,7 +1672,7 @@ void Game::saveWorldState(OutputStream* OS, bool b) {
 		int v2 = 0;
 		for (int n8 = 0; n8 < 8; ++n8) {
 			if (0x0 != (app->render->mapFlags[n7 + n8] & 0x80)) {
-				v2 |= 1 << n8;
+				v2 |= bit32(n8);
 			}
 		}
 		OS->writeByte(v2);
@@ -1794,7 +1795,7 @@ bool Game::loadWorldState(InputStream* IS) {
 				byte1 = IS->readByte();
 				n = 0;
 			}
-			if ((byte1 & 1 << n) != 0x0) {
+			if ((byte1 & bit32(n)) != 0x0) {
 				app->render->lineFlags[j >> 1] |= (uint8_t)(8 << ((j & 0x1) << 2));
 			}
 			++n;
@@ -1810,14 +1811,14 @@ bool Game::loadWorldState(InputStream* IS) {
 		while (k < numMapSprites) {
 			uint8_t byte3 = IS->readByte();
 			for (int l = 0; l < 8; ++l, ++k) {
-				if ((byte3 & 1 << l) != 0x0) {
+				if ((byte3 & bit32(l)) != 0x0) {
 					app->render->mapSpriteInfo[k] |= 0x10000;
 				}
 				else {
 					app->render->mapSpriteInfo[k] &= ~0x10000;
 				}
 				++l;
-				if ((byte3 & 1 << l) != 0x0) {
+				if ((byte3 & bit32(l)) != 0x0) {
 					app->render->mapSpriteInfo[k] |= 0x200000;
 				}
 				else {
@@ -1830,7 +1831,7 @@ bool Game::loadWorldState(InputStream* IS) {
 		for (int n7 = 1024, n8 = 0; n8 < n7; n8 += 8) {
 			uint8_t byte4 = IS->readByte();
 			for (int n9 = 0; n9 < 8; ++n9) {
-				if ((byte4 & 1 << n9) != 0x0) {
+				if ((byte4 & bit32(n9)) != 0x0) {
 					app->render->mapFlags[n8 + n9] |= (uint8_t)0x80;
 				}
 			}
@@ -1975,7 +1976,7 @@ void Game::saveConfig() {
 	else {
 		app->Error("I/O Error in saveConfig"); // ERR_SAVECONFIG
 	}
-	OS.~OutputStream();
+	OS.dispose();
 }
 
 void Game::loadConfig() {
@@ -2142,7 +2143,7 @@ void Game::loadConfig() {
 			IS.close();
 		}
 	}
-	IS.~InputStream();
+	IS.dispose();
 }
 
 void Game::saveState(int lastMapID, int loadMapID, int viewX, int viewY, int viewAngle, int viewPitch, int prevX, int prevY, int saveX, int saveY, int saveZ, int saveAngle, int savePitch, int saveType) {
@@ -2172,7 +2173,7 @@ void Game::saveState(int lastMapID, int loadMapID, int viewX, int viewY, int vie
 
 		if (OS.openFile(name, 1)) {
 			if (!this->savePlayerState(&OS, loadMapID, viewX, viewY, viewAngle, viewPitch, prevX, prevY, saveX, saveY, saveZ, saveAngle, savePitch)) {
-				OS.~OutputStream();
+				OS.dispose();
 				OS.close();
 				return;
 			}
@@ -2202,7 +2203,7 @@ void Game::saveState(int lastMapID, int loadMapID, int viewX, int viewY, int vie
 
 	app->canvas->loadRuntimeData();
 
-	OS.~OutputStream();
+	OS.dispose();
 }
 
 void Game::saveLevelSnapshot() {
@@ -2238,7 +2239,7 @@ void Game::saveLevelSnapshot() {
 			}
 		}
 	}
-	OS.~OutputStream();
+	OS.dispose();
 }
 
 bool Game::savePlayerState(OutputStream* OS, int loadMapID, int viewX, int viewY, int viewAngle, int viewPitch, int prevX, int prevY, int saveX, int saveY, int saveZ, int saveAngle, int savePitch) {
@@ -2307,7 +2308,7 @@ bool Game::loadState(int activeLoadType) {
 		app->Error("loadState: failed to open player file");
 	}
 
-	IS.~InputStream();
+	IS.dispose();
 	return rtn;
 }
 
@@ -2319,7 +2320,7 @@ bool Game::hasConfig() {
 			return true;
 		}
 	}
-	IS.~InputStream();
+	IS.dispose();
 	return false;
 }
 
@@ -2457,7 +2458,7 @@ void Game::saveEmptyConfig() {
 	else {
 		app->Error("I/O Error in saveConfig");
 	}
-	OS.~OutputStream();
+	OS.dispose();
 }
 
 bool Game::canSnapMonsters() {
@@ -3743,11 +3744,11 @@ int64_t Game::FixedSqrt(int64_t n) {
 }
 
 void Game::setMonsterClip(int n, int n2) {
-	this->baseVisitedTiles[n2] |= 1 << n;
+	this->baseVisitedTiles[n2] |= bit32(n);
 }
 
 void Game::unsetMonsterClip(int n, int n2) {
-	this->baseVisitedTiles[n2] &= ~(1 << n);
+	this->baseVisitedTiles[n2] &= ~(bit32(n));
 }
 
 bool Game::monsterClipExists(int n, int n2) {

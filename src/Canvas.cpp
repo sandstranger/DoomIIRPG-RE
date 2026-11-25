@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "Bits.h"
 #include <assert.h>
 #include <algorithm>
 
@@ -1392,10 +1393,10 @@ void Canvas::checkFacingEntity() {
 	}
 	Entity* traceEntity2 = app->game->traceEntity;
 	int n2 = 4141;
-	if (traceEntity2 != nullptr && (1 << traceEntity2->def->eType & n2) == 0x0) {
+	if (traceEntity2 != nullptr && (bit32(traceEntity2->def->eType) & n2) == 0x0) {
 		for (int j = 1; j < app->game->numTraceEntities; ++j) {
 			Entity* entity2 = app->game->traceEntities[j];
-			if ((1 << entity2->def->eType & n2) != 0x0) {
+			if ((bit32(entity2->def->eType) & n2) != 0x0) {
 				traceEntity2 = entity2;
 				break;
 			}
@@ -1406,7 +1407,7 @@ void Canvas::checkFacingEntity() {
 		if (dist2 <= app->combat->tileDistances[0] && traceEntity2->def->eType == 0 && app->combat->weaponDown) {
 			app->combat->shiftWeapon(true);
 		}
-		else if ((this->state == Canvas::ST_PLAYING || this->state == Canvas::ST_DIALOG) && ((0x2 & 1 << app->player->ce->weapon) == 0x0 || dist2 <= app->combat->tileDistances[0])) {
+		else if ((this->state == Canvas::ST_PLAYING || this->state == Canvas::ST_DIALOG) && ((0x2 & bit32(app->player->ce->weapon)) == 0x0 || dist2 <= app->combat->tileDistances[0])) {
 			if (traceEntity2->def->eType == 3) {
 				app->combat->shiftWeapon(true);
 			}
@@ -1467,7 +1468,7 @@ void Canvas::finishMovement() {
 int Canvas::flagForWeapon(int i) {
 	Applet* app = CAppContainer::getInstance()->app;
 	bool weaponIsASentryBot = app->player->weaponIsASentryBot(i);
-	i = 1 << i;
+	i = bit32(i);
 	if (weaponIsASentryBot && (!app->player->isFamiliar || (app->player->familiarType != 1 && app->player->familiarType != 3))) {
 		return 0;
 	}
@@ -2348,7 +2349,7 @@ bool Canvas::handlePlayingEvents(int key, int action) {
 			}
 			else {
 				if (eType == 10) {
-					if ((1 << entity3->def->eSubType & 0x1) == 0x0 || app->player->ce->weapon == 1) {
+					if ((bit32(entity3->def->eSubType) & 0x1) == 0x0 || app->player->ce->weapon == 1) {
 						if (n6 == 0) {
 							entity = entity3;
 							n4 = n11;
@@ -2489,10 +2490,10 @@ bool Canvas::handlePlayingEvents(int key, int action) {
 			return true;
 		}
 		int n12 = weapon2 * 9;
-		if (entity != nullptr && entity->def->eType == 10 && (1 << entity->def->eSubType & 0x1) == 0x0 && app->combat->WorldDistToTileDist(dist2) > app->combat->weapons[n12 + 3]) {
+		if (entity != nullptr && entity->def->eType == 10 && (bit32(entity->def->eSubType) & 0x1) == 0x0 && app->combat->WorldDistToTileDist(dist2) > app->combat->weapons[n12 + 3]) {
 			entity = nullptr;
 		}
-		if (entity2 != nullptr && (entity == nullptr || (1 << weapon2 & 0x0) != 0x0 || (entity->def->eType != 2 && entity->def->eType != 9))) {
+		if (entity2 != nullptr && (entity == nullptr || (bit32(weapon2) & 0x0) != 0x0 || (entity->def->eType != 2 && entity->def->eType != 9))) {
 			entity = entity2;
 		}
 
@@ -2942,8 +2943,8 @@ bool Canvas::handleEvent(int key) {
 			if ((keyAction == Enums::ACTION_FIRE && this->scrollingTextDone) || key == 18) {
 				this->endingGame = false;
 				app->sound->soundStop();
-				app->menuSystem->imgMainBG->~Image();
-				app->menuSystem->imgLogo->~Image();
+				Image::dispose(app->menuSystem->imgMainBG);
+				Image::dispose(app->menuSystem->imgLogo);
 				app->menuSystem->imgMainBG = app->loadImage(Resources::RES_LOGO_BMP_GZ, true);
 				app->menuSystem->imgLogo = app->loadImage(Resources::RES_LOGO2_BMP_GZ, true);
 				app->menuSystem->background = app->menuSystem->imgMainBG;
@@ -3910,7 +3911,7 @@ void Canvas::logoState() {
 		this->repaintFlags |= Canvas::REPAINT_STARTUP_LOGO;
 	}
 	else {
-		this->imgStartupLogo->~Image();
+		Image::dispose(this->imgStartupLogo);
 		this->imgStartupLogo = nullptr;
 
 		this->setState(Canvas::ST_INTRO_MOVIE);
@@ -4546,7 +4547,7 @@ void Canvas::backToMain(bool b) {
 	app->render->unloadMap();
 	app->render->endFade();
 
-	app->menuSystem->imgMainBG->~Image();
+	Image::dispose(app->menuSystem->imgMainBG);
 	app->menuSystem->imgMainBG = app->loadImage("logo.bmp", true);
 
 	if (b) {
@@ -6735,27 +6736,27 @@ void Canvas::initTravelMap() {
 }
 
 void Canvas::disposeTravelMap() {
-	this->imgNameHighlight->~Image();
+	Image::dispose(this->imgNameHighlight);
 	this->imgNameHighlight = nullptr;
-	this->imgMagGlass->~Image();
+	Image::dispose(this->imgMagGlass);
 	this->imgMagGlass = nullptr;
-	this->imgTravelBG->~Image();
+	Image::dispose(this->imgTravelBG);
 	this->imgTravelBG = nullptr;
-	this->imgTravelPath->~Image();
+	Image::dispose(this->imgTravelPath);
 	this->imgTravelPath = nullptr;
-	this->imgSpaceShip->~Image();
+	Image::dispose(this->imgSpaceShip);
 	this->imgSpaceShip = nullptr;
-	this->imgTierCloseUp->~Image();
+	Image::dispose(this->imgTierCloseUp);
 	this->imgTierCloseUp = nullptr;
-	this->imgEarthCloseUp->~Image();
+	Image::dispose(this->imgEarthCloseUp);
 	this->imgEarthCloseUp = nullptr;
-	this->imgMapHorzGridLines->~Image();
+	Image::dispose(this->imgMapHorzGridLines);
 	this->imgMapHorzGridLines = nullptr;
-	this->imgMapVertGridLines->~Image();
+	Image::dispose(this->imgMapVertGridLines);
 	this->imgMapVertGridLines = nullptr;
 
 	// Unused
-	this->imgStarField->~Image();
+	Image::dispose(this->imgStarField);
 	this->imgStarField = nullptr;
 }
 
@@ -7159,7 +7160,7 @@ void Canvas::exitIntroMovie(bool b) {
 
 	app->game->cleanUpCamMemory();
 
-	this->imgProlog->~Image();
+	Image::dispose(this->imgProlog);
 	this->imgProlog = nullptr;
 
 	if (this->dialogBuffer) {
@@ -7778,35 +7779,35 @@ void Canvas::handleMiniGameHelpScreenScroll(int i) {
 }
 
 void Canvas::disposeCharacterSelection() {
-	this->imgCharacter_select_stat_bar->~Image();
+	Image::dispose(this->imgCharacter_select_stat_bar);
 	this->imgCharacter_select_stat_bar = nullptr;
-	this->imgCharacter_select_stat_header->~Image();
+	Image::dispose(this->imgCharacter_select_stat_header);
 	this->imgCharacter_select_stat_header = nullptr;
-	this->imgTopBarFill->~Image();
+	Image::dispose(this->imgTopBarFill);
 	this->imgTopBarFill = nullptr;
-	this->imgCharacter_upperbar->~Image();
+	Image::dispose(this->imgCharacter_upperbar);
 	this->imgCharacter_upperbar = nullptr;
-	this->imgCharacterSelectionAssets->~Image();
+	Image::dispose(this->imgCharacterSelectionAssets);
 	this->imgCharacterSelectionAssets = nullptr;
-	this->imgCharSelectionBG->~Image();
+	Image::dispose(this->imgCharSelectionBG);
 	this->imgCharSelectionBG = nullptr;
-	this->imgMajorMugs->~Image();
+	Image::dispose(this->imgMajorMugs);
 	this->imgMajorMugs = nullptr;
-	this->imgSargeMugs->~Image();
+	Image::dispose(this->imgSargeMugs);
 	this->imgSargeMugs = nullptr;
-	this->imgScientistMugs->~Image();
+	Image::dispose(this->imgScientistMugs);
 	this->imgScientistMugs = nullptr;
-	this->imgMajor_legs->~Image();
+	Image::dispose(this->imgMajor_legs);
 	this->imgMajor_legs = nullptr;
-	this->imgMajor_torso->~Image();
+	Image::dispose(this->imgMajor_torso);
 	this->imgMajor_torso = nullptr;
-	this->imgRiley_legs->~Image();
+	Image::dispose(this->imgRiley_legs);
 	this->imgRiley_legs = nullptr;
-	this->imgRiley_torso->~Image();
+	Image::dispose(this->imgRiley_torso);
 	this->imgRiley_torso = nullptr;
-	this->imgSarge_legs->~Image();
+	Image::dispose(this->imgSarge_legs);
 	this->imgSarge_legs = nullptr;
-	this->imgSarge_torso->~Image();
+	Image::dispose(this->imgSarge_torso);
 	this->imgSarge_torso = nullptr;
 }
 

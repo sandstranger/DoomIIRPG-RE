@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "Bits.h"
 
 #include "CAppContainer.h"
 #include "ScriptThread.h"
@@ -447,7 +448,7 @@ uint32_t ScriptThread::run() {
                     n23 = this->app->player->inventory[n22];
                 }
                 else if (n21 == 1) {
-                    if ((this->app->player->weapons & 1 << n22) != 0x0) {
+                    if ((this->app->player->weapons & bit32(n22)) != 0x0) {
                         n23 = 1;
                     }
                 }
@@ -469,7 +470,7 @@ uint32_t ScriptThread::run() {
                 Entity* entity = app->game->entityDb[srcX + (32 * srcY)];
                 if (entity != nullptr) {
                     while (entity != nullptr) {
-                        if (entity->def->eType != 12 && (1 << entity->def->eType & 0x6240) == 0x0) {
+                        if (entity->def->eType != 12 && (bit32(entity->def->eType) & 0x6240) == 0x0) {
                             n26 = 0;
                             break;
                         }
@@ -1449,7 +1450,7 @@ uint32_t ScriptThread::run() {
             case Enums::EV_DISABLED_WEAPONS: {
                 //printf("EV_DISABLED_WEAPONS -> %d\n", this->IP);
                 this->app->player->disabledWeapons = this->getShortArg();
-                if ((this->app->player->disabledWeapons & (1 << this->app->player->ce->weapon)) != 0x0) {
+                if ((this->app->player->disabledWeapons & (bit32(this->app->player->ce->weapon))) != 0x0) {
                     this->app->player->selectNextWeapon();
                     break;
                 }

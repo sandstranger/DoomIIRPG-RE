@@ -80,11 +80,11 @@ void SentryBotGame::initGame(ScriptThread* scriptThread, short botType) {
     this->timeSinceLastCursorMove = app->time;
     this->failedEarly = false;
     
-    this->imgSubmit->~Image();
+    Image::dispose(this->imgSubmit);
     this->imgSubmit = nullptr;
-    this->imgUnk1->~Image();
+    Image::dispose(this->imgUnk1);
     this->imgUnk1 = nullptr;
-    this->imgDelete->~Image();
+    Image::dispose(this->imgDelete);
     this->imgDelete = nullptr;
 
     this->imgSubmit = app->loadImage("matrixSkip_button.bmp", true);

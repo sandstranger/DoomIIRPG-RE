@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "Bits.h"
 #include <algorithm>
 
 #include "CAppContainer.h"
@@ -146,7 +147,8 @@ void Player::selectWeapon(int i) {
     if (app->canvas->isZoomedIn) {
         app->canvas->zoomOut();
     }
-    if ((this->weapons & ~this->disabledWeapons & 1 << i) == 0x0) {
+    // (i is -1 for none: 1 << -1 is undefined, and differs between x86 and arm)
+    if ((i < 0 || i >= 32) || (this->weapons & ~this->disabledWeapons & bit32(i)) == 0x0) {
         this->ce->weapon = i;
         this->selectNextWeapon();
     }
@@ -172,7 +174,7 @@ void Player::selectPrevWeapon() {
     int weapon = this->ce->weapon;
     int n = this->weapons & ~this->disabledWeapons;
     for (int i = weapon - 1; i >= 0; --i) {
-        if ((n & 1 << i) != 0x0) {
+        if ((n & bit32(i)) != 0x0) {
             int n2 = i * 9;
             if (app->combat->weapons[n2 + 5] == 0 || this->ammo[app->combat->weapons[n2 + 4]] != 0 || i == 2) {
                 this->selectWeapon(i);
@@ -182,7 +184,7 @@ void Player::selectPrevWeapon() {
     }
     if (this->ce->weapon == weapon && weapon != 14) {
         for (int j = 14; j > weapon; --j) {
-            if ((n & 1 << j) != 0x0) {
+            if ((n & bit32(j)) != 0x0) {
                 int n3 = j * 9;
                 if (app->combat->weapons[n3 + 5] == 0 || this->ammo[app->combat->weapons[n3 + 4]] != 0 || j == 2) {
                     this->selectWeapon(j);
@@ -199,7 +201,7 @@ void Player::selectNextWeapon() {
     int weapon = this->ce->weapon;
     int n = this->weapons & ~this->disabledWeapons;
     for (int i = weapon + 1; i < 15; ++i) {
-        if ((n & 1 << i) != 0x0) {
+        if ((n & bit32(i)) != 0x0) {
             int n2 = i * 9;
             if (app->combat->weapons[n2 + 5] == 0 || this->ammo[app->combat->weapons[n2 + 4]] != 0 || i == 2) {
                 this->selectWeapon(i);
@@ -209,7 +211,7 @@ void Player::selectNextWeapon() {
     }
     if (this->ce->weapon == weapon && weapon != 0) {
         for (int j = 0; j < weapon; ++j) {
-            if ((n & 1 << j) != 0x0) {
+            if ((n & bit32(j)) != 0x0) {
                 int n3 = j * 9;
                 if (app->combat->weapons[n3 + 5] == 0 || this->ammo[app->combat->weapons[n3 + 4]] != 0 || j == 2) {
                     this->selectWeapon(j);
@@ -255,7 +257,7 @@ bool Player::requireStat(int n,int n2) {
 }
 
 bool Player::requireItem(int n, int n2, int n3, int n4) {
-    int n5 = 1 << n2;
+    int n5 = bit32(n2);
     if (n != 1) {
         return n == 0 && this->inventory[n2 - 0] >= n3 && this->inventory[n2 - 0] <= n4;
     }
@@ -371,7 +373,7 @@ int Player::calcScore() {
     bool b = true;
     int i;
     for (i = 0; i <= 8; ++i) {
-        if ((this->killedMonstersLevels & 1 << i) != 0x0) {
+        if ((this->killedMonstersLevels & bit32(i)) != 0x0) {
             n += 1000;
         }
         else {
@@ -399,7 +401,7 @@ int Player::calcScore() {
     }
     bool b2 = true;
     while (i <= 8) {
-        if ((this->foundSecretsLevels & 1 << i) != 0x0) {
+        if ((this->foundSecretsLevels & bit32(i)) != 0x0) {
             n += 1000;
         }
         else {
@@ -762,7 +764,7 @@ bool Player::fireWeapon(Entity* entity, int n, int n2) {
         return false;
     }
 
-    if (app->combat->weaponDown || (this->disabledWeapons != 0 && (this->weapons & 1 << this->ce->weapon) == 0x0)) {
+    if (app->combat->weaponDown || (this->disabledWeapons != 0 && (this->weapons & bit32(this->ce->weapon)) == 0x0)) {
         return false;
     }
 
@@ -1082,29 +1084,29 @@ void Player::updateQuests(short n, int n2) {
             //app->Error(Enums::ERR_MAX_NOTEBOOKINDEXES); // J2ME
             return;
         }
-        this->questComplete &= (uint8_t)~(1 << this->numNotebookIndexes);
-        this->questFailed &= (uint8_t)~(1 << this->numNotebookIndexes);
+        this->questComplete &= (uint8_t)~(bit32(this->numNotebookIndexes));
+        this->questFailed &= (uint8_t)~(bit32(this->numNotebookIndexes));
         this->notebookIndexes[this->numNotebookIndexes++] = n;
     }
     else {
         for (int i = 0; i < this->numNotebookIndexes; ++i) {
             if (n == this->notebookIndexes[i]) {
                 if (n2 == 1) {
-                    this->questComplete |= (uint8_t)(1 << i);
+                    this->questComplete |= (uint8_t)(bit32(i));
                 }
                 else if (n2 == 2) {
-                    this->questFailed |= (uint8_t)(1 << i);
+                    this->questFailed |= (uint8_t)(bit32(i));
                 }
                 return;
             }
         }
         if (n2 == 1) {
-            this->questComplete |= (uint8_t)(1 << this->numNotebookIndexes);
-            this->questFailed &= (uint8_t)~(1 << this->numNotebookIndexes);
+            this->questComplete |= (uint8_t)(bit32(this->numNotebookIndexes));
+            this->questFailed &= (uint8_t)~(bit32(this->numNotebookIndexes));
         }
         else if (n2 == 2) {
-            this->questComplete &= (uint8_t)~(1 << this->numNotebookIndexes);
-            this->questFailed |= (uint8_t)(1 << this->numNotebookIndexes);
+            this->questComplete &= (uint8_t)~(bit32(this->numNotebookIndexes));
+            this->questFailed |= (uint8_t)(bit32(this->numNotebookIndexes));
         }
         this->notebookPositions[this->numNotebookIndexes] = 0;
         this->notebookIndexes[this->numNotebookIndexes++] = n;
@@ -1121,11 +1123,11 @@ void Player::setQuestTile(int n, int n2, int n3) {
 }
 
 bool Player::isQuestDone(int n) {
-    return (this->questComplete & 1 << n) != 0x0;
+    return (this->questComplete & bit32(n)) != 0x0;
 }
 
 bool Player::isQuestFailed(int n) {
-    return (this->questFailed & 1 << n) != 0x0;
+    return (this->questFailed & bit32(n)) != 0x0;
 }
 
 void Player::formatTime(int n, Text* text) {
@@ -1155,10 +1157,10 @@ void Player::showInvHelp(int n, bool b) {
         return;
     }
     int n2 = n - 0;
-    if ((this->invHelpBitmask & 1 << n2) != 0x0) {
+    if ((this->invHelpBitmask & bit32(n2)) != 0x0) {
         return;
     }
-    this->invHelpBitmask |= 1 << n2;
+    this->invHelpBitmask |= bit32(n2);
     app->canvas->enqueueHelpDialog(app->entityDefManager->find(6, 0, n));
 }
 
@@ -1168,7 +1170,7 @@ void Player::showAmmoHelp(int n, bool b) {
     if (!this->enableHelp && !b) {
         return;
     }
-    int n2 = 1 << n;
+    int n2 = bit32(n);
     if ((this->ammoHelpBitmask & n2) != 0x0) {
         return;
     }
@@ -1186,10 +1188,10 @@ bool Player::showHelp(short n, bool b) {
     if (!this->enableHelp && !b) {
         return false;
     }
-    if ((this->helpBitmask & 1 << n) != 0x0 && !b) {
+    if ((this->helpBitmask & bit32(n)) != 0x0 && !b) {
         return false;
     }
-    this->helpBitmask |= 1 << n;
+    this->helpBitmask |= bit32(n);
     app->canvas->enqueueHelpDialog(n);
     if (n != 5 && (app->canvas->state == Canvas::ST_AUTOMAP || app->canvas->state == Canvas::ST_PLAYING)) {
         app->canvas->dequeueHelpDialog();
@@ -1203,10 +1205,10 @@ void Player::showWeaponHelp(int n, bool b) {
     if (!this->enableHelp && !b) {
         return;
     }
-    if ((this->weaponHelpBitmask & 1 << n) != 0x0) {
+    if ((this->weaponHelpBitmask & bit32(n)) != 0x0) {
         return;
     }
-    this->weaponHelpBitmask |= 1 << n;
+    this->weaponHelpBitmask |= bit32(n);
     app->canvas->enqueueHelpDialog(app->entityDefManager->find(6, 1, n));
 }
 
@@ -1227,7 +1229,7 @@ void Player::drawBuffs(Graphics* graphics) {
     }
     int n5 = numbuffs * 31 + 6;
     for (int n6 = 0; n6 < 15 && n4 < 6; ++n6) {
-        if (this->buffs[0 + n6] > 0 && (1 << n6 & Enums::BUFF_AMT_NOT_DRAWN) == 0x0) {
+        if (this->buffs[0 + n6] > 0 && (bit32(n6) & Enums::BUFF_AMT_NOT_DRAWN) == 0x0) {
             if (this->buffs[15 + n6] > 99 || this->buffs[15 + n6] < -99) {
                 n2 = n - 73;
                 break;
@@ -1524,7 +1526,7 @@ void Player::translateStatusEffects() {
 
     for (int k = 0; k < 15; k++) {
         if (this->buffs[0 + k] > 0) {
-            if ((1 << k & Enums::BUFF_NO_AMOUNT) == 0x0 && this->buffs[15 + k] == 0) {
+            if ((bit32(k) & Enums::BUFF_NO_AMOUNT) == 0x0 && this->buffs[15 + k] == 0) {
                 this->buffs[0 + k] = 0;
             }
             else {
@@ -1607,7 +1609,7 @@ void Player::drawStatusEffectIcon(Graphics* graphics, int n, int n2, int n3, int
         smallBuffer->append('%');
         smallBuffer->append(n2);
     }
-    else if ((1 << n & 0x3A07) == 0x0) {
+    else if ((bit32(n) & 0x3A07) == 0x0) {
         if (n2 >= 0) {
             smallBuffer->append('+');
             smallBuffer->append(n2);
@@ -1666,8 +1668,8 @@ void Player::giveAll() {
         if (this->hasASentryBot()) {
             for (int i = 0; i <= 3; ++i) {
                 int n = 3 + i;
-                if ((this->weapons & 1 << n) != 0x0) {
-                    this->weapons &= ~(1 << n);
+                if ((this->weapons & bit32(n)) != 0x0) {
+                    this->weapons &= ~(bit32(n));
                     this->weapons |= 1 << 3 + (i + 1) % 4;
                     break;
                 }
@@ -2306,7 +2308,7 @@ bool Player::stealFamiliarsInventory() {
         }
     }
     for (int k = 0; k < 15; ++k) {
-        if ((1 << k & weaponsCopy) != 0x0) {
+        if ((bit32(k) & weaponsCopy) != 0x0) {
             this->give(1, k, 1, true);
             b = true;
         }
@@ -2375,7 +2377,7 @@ void Player::handleBotRemains(int n, int n2, int n3) {
         }
     }
     for (int k = 0; k < 15; ++k) {
-        if ((1 << k & weaponsCopy) != 0x0) {
+        if ((bit32(k) & weaponsCopy) != 0x0) {
             int weaponTileNum = app->combat->getWeaponTileNum(k);
             app->game->spawnDropItem(n, n2, weaponTileNum, app->entityDefManager->lookup(weaponTileNum), 1, true);
         }
@@ -2453,11 +2455,11 @@ void Player::startSelfDestructDialog() {
 }
 
 bool Player::vendingMachineIsHacked(int n) {
-    return (this->hackedVendingMachines & 1 << n) == 1 << n;
+    return (this->hackedVendingMachines & bit32(n)) == bit32(n);
 }
 
 void Player::setVendingMachineHack(int n) {
-    this->hackedVendingMachines |= 1 << n;
+    this->hackedVendingMachines |= bit32(n);
 }
 
 int Player::getVendingMachineTriesLeft(int max) {
@@ -2487,7 +2489,7 @@ void Player::removeOneVendingMachineTry(int max) {
 }
 
 bool Player::weaponIsASentryBot(int n) {
-    return (1 << n & Enums::WP_SENTRY_BOT_MASK) != 0x0;
+    return n >= 0 && n < 32 && (bit32(n) & Enums::WP_SENTRY_BOT_MASK) != 0x0;	// (n is -1 for none)
 }
 
 bool Player::hasASentryBot() {
@@ -2751,7 +2753,7 @@ void Player::restoreInventory() {
             this->give(2, i, this->ammoCopy[i], true);
         }
         for (int j = 0; j < 15; ++j) {
-            if ((1 << j & this->weaponsCopy) != 0x0) {
+            if ((bit32(j) & this->weaponsCopy) != 0x0) {
                 this->give(1, j, 1, true);
             }
         }

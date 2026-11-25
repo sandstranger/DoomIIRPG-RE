@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "Bits.h"
 #include <algorithm>
 
 #include "CAppContainer.h"
@@ -263,7 +264,7 @@ bool MenuSystem::startup() {
 	btnVendingArrowDownGlow->highlightRenderMode = 0;
 	this->m_vendingButtons->AddButton(btnVendingArrowDownGlow);
 
-	IS.~InputStream();
+	IS.dispose();
 	return true;
 }
 
@@ -1996,7 +1997,7 @@ void MenuSystem::initMenu(int menu) {
 			this->selectedIndex = 0; // [GEC]
 
 			for (int n10 = 0; n10 < 15; ++n10) {
-				if ((app->player->weapons & 1 << n10) != 0x0) {
+				if ((app->player->weapons & bit32(n10)) != 0x0) {
 					int n11 = (app->player->ce->weapon == 14 && n10 != 14) ? 4 : 0;
 					EntityDef* find5 = app->entityDefManager->find(6, 1, (uint8_t)n10);
 					if (app->player->ce->weapon == n10) {
@@ -3576,10 +3577,10 @@ void MenuSystem::startGame(bool b) {
 	Applet* app = CAppContainer::getInstance()->app;
 
 	if (this->background != this->imgMainBG) {
-		this->background->~Image();
+		Image::dispose(this->background);
 	}
 
-	this->imgMainBG->~Image();
+	Image::dispose(this->imgMainBG);
 
 	this->background = nullptr;
 	this->imgMainBG = nullptr;

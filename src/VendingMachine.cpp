@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "Bits.h"
 #include <algorithm>
 
 #include "CAppContainer.h"
@@ -819,7 +820,7 @@ void VendingMachine::drawGameMiddleBar(Graphics* graphics, Text* text) {
 }
 
 bool VendingMachine::drinkInThisVendingMachine(int n) {
-    return (this->energyDrinkData[(n - 0) * 3 + 2] & 1 << this->currentMapNumber) == 1 << this->currentMapNumber;
+    return (this->energyDrinkData[(n - 0) * 3 + 2] & bit32(this->currentMapNumber)) == bit32(this->currentMapNumber);
 }
 
 short VendingMachine::getDrinkPrice(int n) {

@@ -43,6 +43,12 @@ InputStream::InputStream() {
 }
 
 InputStream::~InputStream() {
+	this->dispose();
+}
+
+// (it was called as IS.~InputStream(), and the object destroyed again at the end of its scope: the destructor's
+// stores of nullptr are dead to the optimiser, so the second freed the same buffers again)
+void InputStream::dispose() {
 	if (this->file) {
 		std::fclose(this->file);
 		this->file = nullptr;
@@ -141,34 +147,44 @@ uint8_t* InputStream::getTop() {
     return &this->data[this->cursor];
 };
 
+// (bounded: a file shorter than its reader expects - an older or cut short config or save - was read on past
+// its end, into whatever the heap had there; past it, reads give zeroes)
+const uint8_t* InputStream::readBytes(int n) {
+    static const uint8_t zeroes[8] = {0};
+    if (this->data && n >= 0 && (int64_t)this->cursor + n <= (int64_t)this->fileSize) {
+        return &this->data[this->cursor];
+    }
+    return zeroes;
+}
+
 int InputStream::readInt()
 {
-    return readData<int32_t>(this->getTop(), this->cursor);
+    return readData<int32_t>(this->readBytes(sizeof(int32_t)), this->cursor);
 }
 
 int InputStream::readShort()
 {
-    return readData<int16_t>(this->getTop(), this->cursor);
+    return readData<int16_t>(this->readBytes(sizeof(int16_t)), this->cursor);
 }
 
 bool InputStream::readBoolean()
 {
-    return readData<uint8_t>(this->getTop(), this->cursor) != 0;
+    return readData<uint8_t>(this->readBytes(sizeof(uint8_t)), this->cursor) != 0;
 }
 
 uint8_t InputStream::readByte()
 {
-    return readData<uint8_t>(this->getTop(), this->cursor);
+    return readData<uint8_t>(this->readBytes(sizeof(uint8_t)), this->cursor);
 }
 
 uint8_t InputStream::readUnsignedByte()
 {
-    return readData<uint8_t>(this->getTop(), this->cursor);
+    return readData<uint8_t>(this->readBytes(sizeof(uint8_t)), this->cursor);
 }
 
 int InputStream::readSignedByte()
 {
-    return (int)readData<int8_t>(this->getTop(), this->cursor);
+    return (int)readData<int8_t>(this->readBytes(sizeof(int8_t)), this->cursor);
 }
 
 void InputStream::read(uint8_t* dest, int off, int size) {
@@ -200,6 +216,12 @@ OutputStream::OutputStream() {
 }
 
 OutputStream::~OutputStream() {
+	this->dispose();
+}
+
+// (it was called as IS.~OutputStream(), and the object destroyed again at the end of its scope: the destructor's
+// stores of nullptr are dead to the optimiser, so the second freed the same buffers again)
+void OutputStream::dispose() {
 	this->close();
 
 	if (this->writeBuff) {
