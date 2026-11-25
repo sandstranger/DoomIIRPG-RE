@@ -1,3 +1,4 @@
+#include <atomic>
 #include <stdexcept>
 #include "Bits.h"
 #include <algorithm>
@@ -17,18 +18,18 @@
 #include <cstdio>
 #endif
 
-static bool g_enableSDLTTF = false;	// (read on every platform, set from android's side)
-static bool g_enableMachineTranslation = false;
+static std::atomic<bool> g_enableSDLTTF(false);	// (read on every platform, set from android's side: on the java side's thread)
+static std::atomic<bool> g_enableMachineTranslation(false);
 
 #if ANDROID
 extern "C"{
 __attribute__((used)) __attribute__((visibility("default")))
-void setEnableSDLTTFState (const bool enableSDLTTF){
-    g_enableSDLTTF = enableSDLTTF;
+void setEnableSDLTTFState (const int enableSDLTTF){   // (an int: JNA passes a java 'boolean' as a 32 bit int)
+    g_enableSDLTTF = (enableSDLTTF != 0);
 }
 __attribute__((used)) __attribute__((visibility("default")))
-void setEnableMachineTranslationState (const bool enableMachineTranslation){
-    g_enableMachineTranslation = enableMachineTranslation;
+void setEnableMachineTranslationState (const int enableMachineTranslation){
+    g_enableMachineTranslation = (enableMachineTranslation != 0);
 }
 }
 #endif
@@ -402,7 +403,7 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 	case 0xbc:
 	case 0xbd:
 	case 0xbe:
-		index1 = chr - '\xbc' + 108;
+		index1 = chr - 0xbc + 108;
 		break;
 	case 0xbf:
 		index1 = 119;
@@ -413,15 +414,15 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 	case 0xc3:
 	case 0xc4:
 	case 0xc5:
-		index2 = 121 + (chr - '\xc0');
+		index2 = 121 + (chr - 0xc0);
 		index1 = 128;
 		break;
 	case 0xc8:
 	case 0xc9:
 	case 0xca:
 	case 0xcb:
-		index2 = 121 + (chr - '\xc8');
-		if (chr == '\xcb') {
+		index2 = 121 + (chr - 0xc8);
+		if (chr == 0xcb) {
 			++index2;
 		}
 		index1 = 129;
@@ -430,8 +431,8 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 	case 0xcd:
 	case 0xce:
 	case 0xcf:
-		index2 = 121 + (chr - '\xcc');
-		if (chr == '\xcf') {
+		index2 = 121 + (chr - 0xcc);
+		if (chr == 0xcf) {
 			++index2;
 		}
 		index1 = 130;
@@ -445,7 +446,7 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 	case 0xd4:
 	case 0xd5:
 	case 0xd6:
-		index2 = 121 + (chr - '\xd2');
+		index2 = 121 + (chr - 0xd2);
 		index1 = 131;
 		break;
 	case 0xd8:
@@ -456,8 +457,8 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 	case 0xda:
 	case 0xdb:
 	case 0xdc:
-		index2 = 121 + (chr - '\xd9');
-		if (chr == '\xdc') {
+		index2 = 121 + (chr - 0xd9);
+		if (chr == 0xdc) {
 			++index2;
 		}
 		index1 = 132;
@@ -475,7 +476,7 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 	case 0xe3:
 	case 0xe4:
 	case 0xe5:
-		index2 = 121 + (chr - '\xe0');
+		index2 = 121 + (chr - 0xe0);
 		index1 = 135;
 		break;
 	case 0xe7:
@@ -485,8 +486,8 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 	case 0xe9:
 	case 0xea:
 	case 0xeb:
-		index2 = 121 + (chr - '\xe8');
-		if (chr == '\xeb') {
+		index2 = 121 + (chr - 0xe8);
+		if (chr == 0xeb) {
 			++index2;
 		}
 		index1 = 136;
@@ -495,8 +496,8 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 	case 0xed:
 	case 0xee:
 	case 0xef:
-		index2 = 121 + (chr - '\xec');
-		if (chr == '\xef') {
+		index2 = 121 + (chr - 0xec);
+		if (chr == 0xef) {
 			++index2;
 		}
 		index1 = 137;
@@ -513,15 +514,15 @@ void Localization::getCharIndices(char c, int* i, int* i2)
 	case 0xf4:
 	case 0xf5:
 	case 0xf6:
-		index2 = 121 + (chr - '\xf2');
+		index2 = 121 + (chr - 0xf2);
 		index1 = 138;
 		break;
 	case 0xf9:
 	case 0xfa:
 	case 0xfb:
 	case 0xfc:
-		index2 = 121 + (chr - '\xf9');
-		if (chr == '\xfc') {
+		index2 = 121 + (chr - 0xf9);
+		if (chr == 0xfc) {
 			++index2;
 		}
 		index1 = 139;

@@ -84,7 +84,7 @@ bool InputStream::loadFile(const char* fileName, int loadType) {
 
 	if (loadType == LT_RESOURCE) {
 		strncpy(namePath, "Payload/Doom2rpg.app/Packages/", sizeof(namePath));
-		strncat(namePath, fileName, sizeof(namePath));
+		strncat(namePath, fileName, sizeof(namePath) - strlen(namePath) - 1);
 		//printf("namePath %s\n", namePath);
 
 		this->data = CAppContainer::getInstance()->zipFile->readZipFileEntry(namePath, &this->fileSize);
@@ -94,7 +94,7 @@ bool InputStream::loadFile(const char* fileName, int loadType) {
 	}
 	else if (loadType == LT_SOUND_RESOURCE) { // [GEC]
 		strncpy(namePath, "Payload/Doom2rpg.app/Packages/sounds2/", sizeof(namePath));
-		strncat(namePath, fileName, sizeof(namePath));
+		strncat(namePath, fileName, sizeof(namePath) - strlen(namePath) - 1);
 		//printf("namePath %s\n", namePath);
 
 		this->data = CAppContainer::getInstance()->zipFile->readZipFileEntry(namePath, &this->fileSize);

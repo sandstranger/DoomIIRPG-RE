@@ -1,4 +1,5 @@
 
+#include <atomic>
 #include <stdexcept>
 
 #include "SDLGL.h"
@@ -8,7 +9,7 @@
 #include "SwappyController.h"
 #include "CAppContainer.h"
 
-static bool g_useGLES2_0 = false;
+static std::atomic<bool> g_useGLES2_0(false);	// (set on the java side's thread)
 #endif
 
 SDLResVidModes sdlResVideoModes[18] = {
@@ -57,8 +58,8 @@ void SDLGL::shutdown() {
 #ifdef ANDROID
 extern "C" {
 __attribute__((used)) __attribute__((visibility("default")))
-void setUseGLES2_0State(const bool useGLES2_0) {
-    g_useGLES2_0 = useGLES2_0;
+void setUseGLES2_0State(const int useGLES2_0) {   // (an int: JNA passes a java 'boolean' as a 32 bit int)
+    g_useGLES2_0 = (useGLES2_0 != 0);
 }
 }
 
